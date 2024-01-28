@@ -13,3 +13,6 @@
 Перейдите в директорию сборки: cd target/
 
 Запустите приложение: java -cp monitoring-service-1.0-TASK.jar com.shaikhraziev.ApplicationRunner
+
+
+**telegram:** @MishaShaikh

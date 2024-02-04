@@ -1,5 +1,6 @@
 package com.shaikhraziev.dto;
 
+import com.shaikhraziev.entity.Role;
 import lombok.Builder;
 import lombok.Value;
 
@@ -18,4 +19,9 @@ public class UserCreateEditDto {
      * password возможного пользователя
      */
     String password;
+
+    /**
+     * Роль возможного пользователя
+     */
+    Role role;
 }

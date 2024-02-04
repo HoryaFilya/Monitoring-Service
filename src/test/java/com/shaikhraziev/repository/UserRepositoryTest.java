@@ -1,40 +1,72 @@
 package com.shaikhraziev.repository;
 
+import com.shaikhraziev.UnitTestBase;
+import com.shaikhraziev.dto.IndicationCreateEditDto;
+import com.shaikhraziev.dto.IndicationReadDto;
 import com.shaikhraziev.dto.UserCreateEditDto;
-import com.shaikhraziev.entity.Indication;
 import com.shaikhraziev.entity.User;
+import com.shaikhraziev.util.ConnectionManager;
+import com.shaikhraziev.util.PropertiesUtil;
+import lombok.SneakyThrows;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
-import java.util.HashMap;
 
+import static com.shaikhraziev.entity.Role.USER;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
-class UserRepositoryTest {
+public class UserRepositoryTest extends UnitTestBase {
 
-    private final UserRepository userRepository = new UserRepository();
+    private final ConnectionManager connectionManager = new ConnectionManager(
+            PropertiesUtil.get(container.getJdbcUrl()),
+            PropertiesUtil.get("db.username.test"),
+            PropertiesUtil.get("db.password.test")
+    );
 
-    private final User MISHA = new User(1L, "misha", "123q", new HashMap<>(), null);
-    private final Indication INDICATIONS = new Indication(100L, 200L, 300L);
-    private final LocalDate DATE = LocalDate.now();
+    private final UserRepository userRepository = new UserRepository(connectionManager);
+
+    private final User MISHA = new User(null, "misha", "123q", USER);
+
     private final UserCreateEditDto USER_DTO = UserCreateEditDto.builder()
             .username("katya")
             .password("123q")
             .build();
+    private final IndicationReadDto ACTUAL_INDICATIONS = IndicationReadDto.builder()
+            .date(LocalDate.now())
+            .heating(100L)
+            .hotWater(200L)
+            .coldWater(300L)
+            .build();
+
+    private final IndicationCreateEditDto TRANSMITTED_INDICATIONS = IndicationCreateEditDto.builder()
+            .heating(100L)
+            .hotWater(200L)
+            .coldWater(300L)
+            .build();
 
     @Test
+    @SneakyThrows
     void shouldSaveUser() {
         var actualResult = userRepository.save(MISHA);
-        var actualDatabase = userRepository.getDatabase().get();
 
-        var expectedResult = MISHA;
-
-        assertThat(actualResult).isEqualTo(expectedResult);
-        assertThat(actualDatabase).hasSize(1);
+        assertThat(actualResult).isTrue();
     }
 
     @Test
+    @SneakyThrows
+    void shouldGetUser() {
+        var actualResult = userRepository.save(MISHA);
+
+        assertThat(actualResult).isTrue();
+
+        var actualResult2 = userRepository.findByUsername(MISHA.getUsername());
+
+        assertThat(actualResult2).isPresent();
+    }
+
+    @Test
+    @SneakyThrows
     void shouldNotFindUserByUsernameAndPassword() {
         var actualResult = userRepository.findByUsernameAndPassword(USER_DTO);
 
@@ -42,6 +74,7 @@ class UserRepositoryTest {
     }
 
     @Test
+    @SneakyThrows
     void shouldFindByUsername() {
         userRepository.save(MISHA);
         var actualResult = userRepository.findByUsername(MISHA.getUsername());
@@ -50,56 +83,60 @@ class UserRepositoryTest {
     }
 
     @Test
+    @SneakyThrows
     void shouldGetActualIndications() {
         userRepository.save(MISHA);
-        userRepository.uploadIndications(MISHA, INDICATIONS, DATE);
+        userRepository.uploadIndications(MISHA.getId(), TRANSMITTED_INDICATIONS);
 
-        var actualResult = userRepository.getActualIndications(MISHA.getUsername());
+        var actualResult = userRepository.getActualIndications(MISHA.getId());
 
         assertThat(actualResult).isPresent();
 
-        var expectedResult = INDICATIONS;
-        actualResult.ifPresent(actual -> assertEquals(actual.get(DATE), expectedResult));
+        var expectedResult = ACTUAL_INDICATIONS;
+        actualResult.ifPresent(actual -> assertEquals(actual, expectedResult));
     }
 
     @Test
+    @SneakyThrows
     void shouldUploadIndications() {
         userRepository.save(MISHA);
-        userRepository.uploadIndications(MISHA, INDICATIONS, DATE);
+        userRepository.uploadIndications(MISHA.getId(), TRANSMITTED_INDICATIONS);
 
-        var actualResult = userRepository.getActualIndications(MISHA.getUsername()).get();
-        var expectedResult = INDICATIONS;
+        var actualResult = userRepository.getActualIndications(MISHA.getId());
+        var expectedResult = ACTUAL_INDICATIONS;
 
-        assertThat(actualResult).hasSize(1);
-        assertThat(actualResult.get(DATE)).isEqualTo(expectedResult);
+        assertThat(actualResult).isPresent();
+
+        actualResult.ifPresent(actual -> assertEquals(actual, expectedResult));
     }
 
     @Test
+    @SneakyThrows
     void shouldGetMonthlyIndications() {
         userRepository.save(MISHA);
-        userRepository.uploadIndications(MISHA, INDICATIONS, DATE);
+        userRepository.uploadIndications(MISHA.getId(), TRANSMITTED_INDICATIONS);
 
-        var actualResult = userRepository.getMonthlyIndications(MISHA.getUsername(), LocalDate.now().getMonth());
+        var actualResult = userRepository.getMonthlyIndications(MISHA.getId(), LocalDate.now().getMonth());
 
-        assertThat(actualResult.get()).hasSize(1);
+        assertThat(actualResult).hasSize(1);
     }
 
     @Test
+    @SneakyThrows
     void shouldGetHistory() {
         userRepository.save(MISHA);
-        var actualResult = userRepository.getHistory(MISHA.getUsername());
+        var actualResult = userRepository.getHistory(MISHA.getId());
 
-        assertThat(actualResult.get()).isEmpty();
+        assertThat(actualResult).isNotEmpty();
+
+        assertThat(actualResult).isEmpty();
     }
 
     @Test
-    void shouldGetDatabase() {
-        var actualResult = userRepository.getDatabase().get();
+    @SneakyThrows
+    void shouldNotHaveUploadedIndications() {
+        var actualResult = userRepository.indicationsAlreadyUploaded(MISHA.getId(), LocalDate.now().getMonth());
 
-        assertThat(actualResult).isEmpty();
-
-        userRepository.save(MISHA);
-
-        assertThat(actualResult).isNotEmpty();
+        assertThat(actualResult).isFalse();
     }
 }

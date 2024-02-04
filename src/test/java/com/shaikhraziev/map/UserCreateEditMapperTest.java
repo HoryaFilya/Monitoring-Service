@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
 
+import static com.shaikhraziev.entity.Role.USER;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class UserCreateEditMapperTest {
@@ -20,7 +21,7 @@ class UserCreateEditMapperTest {
     @Test
     void shouldMapUserDtoToUser() {
         var actualResult = userCreateEditMapper.map(USER_DTO);
-        var expectedResult = new User(User.getCount() - 1, "katya", "123w", new HashMap<>(), null);
+        var expectedResult = new User(null, "katya", "123w", USER);
 
         assertThat(actualResult).isEqualTo(expectedResult);
     }

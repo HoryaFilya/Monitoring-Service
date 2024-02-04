@@ -1,13 +1,15 @@
 package com.shaikhraziev.service;
 
+import com.shaikhraziev.dto.IndicationReadDto;
 import com.shaikhraziev.dto.UserCreateEditDto;
 import com.shaikhraziev.dto.UserReadDto;
-import com.shaikhraziev.entity.Indication;
+import com.shaikhraziev.entity.Role;
 import com.shaikhraziev.entity.User;
 import com.shaikhraziev.map.UserCreateEditMapper;
 import com.shaikhraziev.map.UserReadMapper;
+import com.shaikhraziev.repository.AuditRepository;
 import com.shaikhraziev.repository.UserRepository;
-import com.shaikhraziev.validation.UserValidation;
+import lombok.SneakyThrows;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -19,6 +21,8 @@ import java.util.*;
 
 import static java.time.Month.JANUARY;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -35,7 +39,7 @@ class UserServiceTest {
     @Mock
     private UserReadMapper userReadMapper;
     @Mock
-    private AuditService auditService;
+    private AuditRepository auditRepository;
 
     private final UserCreateEditDto USER_DTO = UserCreateEditDto.builder()
             .username("misha")
@@ -52,13 +56,17 @@ class UserServiceTest {
             .id(1L)
             .username("misha")
             .password("123q")
-            .databaseIndications(new HashMap<>())
             .build();
 
-    private final Indication INDICATIONS = new Indication(100L, 200L, 300L);
-    private final LocalDate DATE = LocalDate.now();
+    private final IndicationReadDto INDICATIONS = IndicationReadDto.builder()
+            .date(LocalDate.now())
+            .heating(100L)
+            .hotWater(200L)
+            .coldWater(300L)
+            .build();
 
     @Test
+    @SneakyThrows
     void shouldRegisterUser() {
         when(userCreateEditMapper.map(USER_DTO)).thenReturn(MISHA);
         when(userRepository.findByUsername(anyString())).thenReturn(Optional.empty());
@@ -68,10 +76,11 @@ class UserServiceTest {
         assertThat(actualResult).isTrue();
 
         verify(userRepository).save(MISHA);
-        verify(auditService).registration(MISHA.getUsername());
+        verify(auditRepository).registration(MISHA.getUsername());
     }
 
     @Test
+    @SneakyThrows
     void shouldAuthorizeUser() {
         when(userRepository.findByUsernameAndPassword(USER_DTO)).thenReturn(Optional.of(MISHA));
         when(userReadMapper.map(MISHA)).thenReturn(USER_READ_DTO);
@@ -83,49 +92,39 @@ class UserServiceTest {
     }
 
     @Test
+    @SneakyThrows
     void shouldGetActualIndications() {
-        Map<LocalDate, Indication> indications = new HashMap<>();
-        indications.put(DATE, INDICATIONS);
+        when(userRepository.getActualIndications(MISHA.getId())).thenReturn(Optional.of(INDICATIONS));
 
-        when(userRepository.getActualIndications("misha")).thenReturn(Optional.of(indications));
-
-        var actualResult = userService.getActualIndications("misha");
+        var actualResult = userService.getActualIndications(MISHA.getId());
 
         assertThat(actualResult).isPresent();
-        assertThat(actualResult.get()).isEqualTo(indications);
+
+        actualResult.ifPresent(actual -> assertEquals(actual, INDICATIONS));
+        assertThat(actualResult.get()).isEqualTo(INDICATIONS);
     }
 
     @Test
+    @SneakyThrows
     void shouldGetMonthlyIndications() {
-        when(userRepository.getMonthlyIndications("misha", JANUARY)).thenReturn(Optional.of(List.of(INDICATIONS)));
+        when(userRepository.getMonthlyIndications(MISHA.getId(), JANUARY)).thenReturn(List.of(INDICATIONS));
 
-        var actualResult = userService.getMonthlyIndications("misha", JANUARY);
+        var actualResult = userService.getMonthlyIndications(MISHA.getId(), JANUARY);
 
-        assertThat(actualResult).isPresent();
-        assertThat(actualResult.get()).isEqualTo(List.of(INDICATIONS));
+        assertThat(actualResult).isNotEmpty();
+        assertThat(actualResult).isEqualTo(List.of(INDICATIONS));
     }
 
     @Test
+    @SneakyThrows
     void shouldGetHistory() {
-        Map<LocalDate, Indication> history = Map.of(DATE, INDICATIONS);
+        List<IndicationReadDto> history = List.of(INDICATIONS);
 
-        when(userRepository.getHistory("misha")).thenReturn(Optional.of(history));
+        when(userRepository.getHistory(MISHA.getId())).thenReturn(history);
 
-        var actualResult = userService.getHistory("misha");
+        var actualResult = userService.getHistory(MISHA.getId());
 
-        assertThat(actualResult).isPresent();
-        assertThat(actualResult.get()).isEqualTo(history);
-    }
-
-    @Test
-    void shouldGetDatabase() {
-        Map<String, User> database = Map.of("misha", MISHA);
-
-        when(userRepository.getDatabase()).thenReturn(Optional.of(database));
-
-        var actualResult = userService.getDatabase();
-
-        assertThat(actualResult).isPresent();
-        assertThat(actualResult.get()).isEqualTo(database);
+        assertThat(actualResult).isNotEmpty();
+        assertThat(actualResult).isEqualTo(history);
     }
 }

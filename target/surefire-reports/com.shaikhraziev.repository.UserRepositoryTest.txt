@@ -1,4 +1,50 @@
 -------------------------------------------------------------------------------
 Test set: com.shaikhraziev.repository.UserRepositoryTest
 -------------------------------------------------------------------------------
-Tests run: 8, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.008 s - in com.shaikhraziev.repository.UserRepositoryTest
+Tests run: 9, Failures: 0, Errors: 8, Skipped: 0, Time elapsed: 0.439 s <<< FAILURE! - in com.shaikhraziev.repository.UserRepositoryTest
+shouldNotHaveUploadedIndications  Time elapsed: 0.215 s  <<< ERROR!
+java.lang.NullPointerException: Cannot invoke "java.lang.Long.longValue()" because "id" is null
+	at com.shaikhraziev.repository.UserRepositoryTest.shouldNotHaveUploadedIndications(UserRepositoryTest.java:129)
+
+shouldUploadIndications  Time elapsed: 0.024 s  <<< ERROR!
+org.postgresql.util.PSQLException: 
+ERROR: duplicate key value violates unique constraint "users_username_key"
+  Подробности: Key (username)=(misha) already exists.
+	at com.shaikhraziev.repository.UserRepositoryTest.shouldUploadIndications(UserRepositoryTest.java:93)
+
+shouldGetMonthlyIndications  Time elapsed: 0.015 s  <<< ERROR!
+org.postgresql.util.PSQLException: 
+ERROR: duplicate key value violates unique constraint "users_username_key"
+  Подробности: Key (username)=(misha) already exists.
+	at com.shaikhraziev.repository.UserRepositoryTest.shouldGetMonthlyIndications(UserRepositoryTest.java:107)
+
+shouldGetUser  Time elapsed: 0.012 s  <<< ERROR!
+org.postgresql.util.PSQLException: 
+ERROR: duplicate key value violates unique constraint "users_username_key"
+  Подробности: Key (username)=(misha) already exists.
+	at com.shaikhraziev.repository.UserRepositoryTest.shouldGetUser(UserRepositoryTest.java:50)
+
+shouldFindByUsername  Time elapsed: 0.012 s  <<< ERROR!
+org.postgresql.util.PSQLException: 
+ERROR: duplicate key value violates unique constraint "users_username_key"
+  Подробности: Key (username)=(misha) already exists.
+	at com.shaikhraziev.repository.UserRepositoryTest.shouldFindByUsername(UserRepositoryTest.java:70)
+
+shouldGetHistory  Time elapsed: 0.039 s  <<< ERROR!
+org.postgresql.util.PSQLException: 
+ERROR: duplicate key value violates unique constraint "users_username_key"
+  Подробности: Key (username)=(misha) already exists.
+	at com.shaikhraziev.repository.UserRepositoryTest.shouldGetHistory(UserRepositoryTest.java:118)
+
+shouldGetActualIndications  Time elapsed: 0.048 s  <<< ERROR!
+org.postgresql.util.PSQLException: 
+ERROR: duplicate key value violates unique constraint "users_username_key"
+  Подробности: Key (username)=(misha) already exists.
+	at com.shaikhraziev.repository.UserRepositoryTest.shouldGetActualIndications(UserRepositoryTest.java:79)
+
+shouldSaveUser  Time elapsed: 0.049 s  <<< ERROR!
+org.postgresql.util.PSQLException: 
+ERROR: duplicate key value violates unique constraint "users_username_key"
+  Подробности: Key (username)=(misha) already exists.
+	at com.shaikhraziev.repository.UserRepositoryTest.shouldSaveUser(UserRepositoryTest.java:42)
+

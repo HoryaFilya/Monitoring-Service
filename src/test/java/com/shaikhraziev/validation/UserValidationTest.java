@@ -1,36 +1,38 @@
 package com.shaikhraziev.validation;
 
+import com.shaikhraziev.dto.IndicationCreateEditDto;
+import com.shaikhraziev.dto.IndicationReadDto;
 import com.shaikhraziev.dto.UserCreateEditDto;
 import com.shaikhraziev.dto.UserReadDto;
-import com.shaikhraziev.entity.Indication;
 import com.shaikhraziev.entity.User;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 
 import static com.shaikhraziev.entity.Action.EXIT;
+import static com.shaikhraziev.entity.Role.USER;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class UserValidationTest {
 
-    private UserValidation userValidation = new UserValidation();
-    private User MISHA = new User(1L, "misha", "123q", new HashMap<>(), null);
-    private final Indication INDICATIONS = new Indication(100L, 200L, 300L);
-    private final Indication ACTUAL_INDICATIONS = new Indication(100L, 200L, 300L);
-    private final Indication TRANSMITTED_INDICATIONS = new Indication(200L, 300L, 400L);
-    private final LocalDate DATE = LocalDate.now();
-    private UserCreateEditDto USER_CREATE_EDIT_DTO = UserCreateEditDto.builder()
+    private final UserValidation userValidation = new UserValidation();
+    private final User MISHA = new User(null, "misha", "123q", USER);
+    private final UserCreateEditDto USER_CREATE_EDIT_DTO = UserCreateEditDto.builder()
             .username(MISHA.getUsername())
             .password(MISHA.getPassword())
             .build();
+    private final IndicationReadDto INDICATIONS_READ = IndicationReadDto.builder()
+            .date(LocalDate.now())
+            .heating(100L)
+            .hotWater(200L)
+            .coldWater(300L)
+            .build();
 
-    private UserReadDto USER_READ_DTO = UserReadDto.builder()
-            .id(1L)
-            .username("katya")
-            .password("123w")
+    private final IndicationCreateEditDto INDICATIONS_CREATE_EDIT = IndicationCreateEditDto.builder()
+            .heating(100L)
+            .hotWater(200L)
+            .coldWater(300L)
             .build();
 
     @Test
@@ -38,19 +40,14 @@ class UserValidationTest {
         var actualResult = userValidation.loginAndPassword(MISHA.getUsername(), MISHA.getPassword());
         var expectedResult = USER_CREATE_EDIT_DTO;
 
+        assertThat(actualResult).isPresent();
+
         assertThat(actualResult.get()).isEqualTo(expectedResult);
     }
 
     @Test
     void shouldValidateInput() {
         var actualResult = userValidation.isValidInput(USER_CREATE_EDIT_DTO);
-
-        assertThat(actualResult).isTrue();
-    }
-
-    @Test
-    void shouldValidateUser() {
-        var actualResult = userValidation.isValidUser(Optional.of(USER_READ_DTO));
 
         assertThat(actualResult).isTrue();
     }
@@ -71,35 +68,14 @@ class UserValidationTest {
 
     @Test
     void shouldValidateUploadIndications() {
-        var actualResult = userValidation.isValidUploadIndications(INDICATIONS);
+        var actualResult = userValidation.isValidUploadIndications(INDICATIONS_CREATE_EDIT);
 
         assertThat(actualResult).isTrue();
     }
 
     @Test
     void shouldBeTransmittedMoreThanActual() {
-        var actualResult = userValidation.isTransmittedMoreActual(ACTUAL_INDICATIONS, TRANSMITTED_INDICATIONS);
-
-        assertThat(actualResult).isTrue();
-    }
-
-    @Test
-    void shouldNotHaveUploadedIndications() {
-        var actualResult = userValidation.indicationsAlreadyUploaded(MISHA);
-
-        assertThat(actualResult).isFalse();
-    }
-
-    @Test
-    void shouldNotHaveMonthlyIndications() {
-        var actualResult = userValidation.haveMonthlyIndications(Optional.empty());
-
-        assertThat(actualResult).isFalse();
-    }
-
-    @Test
-    void shouldHaveHistory() {
-        var actualResult = userValidation.haveHistory(Optional.of(Map.of(DATE, INDICATIONS)));
+        var actualResult = userValidation.isTransmittedMoreActual(INDICATIONS_READ, INDICATIONS_CREATE_EDIT);
 
         assertThat(actualResult).isTrue();
     }

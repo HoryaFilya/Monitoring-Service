@@ -1,5 +1,7 @@
 package com.shaikhraziev;
 
+import com.shaikhraziev.config.LiquibaseConfig;
+import com.shaikhraziev.util.ConnectionManager;
 import com.shaikhraziev.util.PropertiesUtil;
 import org.junit.jupiter.api.BeforeAll;
 import org.testcontainers.containers.PostgreSQLContainer;
@@ -13,5 +15,15 @@ public abstract class UnitTestBase {
     @BeforeAll
     static void runContainer() {
         container.start();
+
+        ConnectionManager connectionManager = new ConnectionManager(
+                container.getJdbcUrl(),
+                container.getUsername(),
+                container.getPassword()
+        );
+
+        LiquibaseConfig liquibaseConfigForTest = new LiquibaseConfig(connectionManager);
+
+        liquibaseConfigForTest.startMigrations();
     }
 }

@@ -36,8 +36,8 @@ public class UserService {
     /**
      * Регистрирует пользователя
      *
-     * @param userDto username и password, введенные пользователем
-     * @return Возвращает результат регистрации
+     * @param userDto   username и password, введенные пользователем
+     * @return          Возвращает true при успешной регистрации
      */
 
     @SneakyThrows
@@ -58,8 +58,8 @@ public class UserService {
     /**
      * Авторизирует пользователя
      *
-     * @param userDto username и password, введенные пользователем
-     * @return Возвращает результат авторизации
+     * @param userDto   username и password, введенные пользователем
+     * @return          Возвращает пользователя, если он существует
      */
     @SneakyThrows
     public Optional<UserReadDto> authorization(UserCreateEditDto userDto) {
@@ -70,8 +70,8 @@ public class UserService {
     /**
      * Ищет пользователя по username
      *
-     * @param username username пользователя
-     * @return Возвращает пользователя, если он существует
+     * @param username  username пользователя
+     * @return          Возвращает пользователя, если он существует
      */
     @SneakyThrows
     public Optional<UserReadDto> findByUsername(String username) {
@@ -90,8 +90,8 @@ public class UserService {
     /**
      * Ищет актуальные показания
      *
-     * @param id id пользователя
-     * @return Возвращает актуальные показания пользователя, если они существуют
+     * @param id    id пользователя
+     * @return      Возвращает актуальные показания пользователя, если они существуют
      */
     @SneakyThrows
     public Optional<IndicationReadDto> getActualIndications(Long id) {
@@ -125,6 +125,12 @@ public class UserService {
         });
     }
 
+    /**
+     * Проверяет, подавали ли показания в этом месяце
+     * @param id            id пользователя
+     * @param currentMonth  Текущий месяц
+     * @return              Возвращает true, если показания передавали в этом месяце
+     */
     @SneakyThrows
     private boolean indicationsAlreadyUploaded(Long id, Month currentMonth) {
         if (userRepository.indicationsAlreadyUploaded(id, currentMonth)) {
@@ -136,9 +142,9 @@ public class UserService {
     /**
      * Ищет показания пользователя за конкретный месяц
      *
-     * @param id       id пользователя
-     * @param month    Месяц
-     * @return Возвращает показания пользователя за конкретный месяц, если они передавались
+     * @param id        id пользователя
+     * @param month     Месяц
+     * @return          Возвращает показания пользователя за конкретный месяц, если они передавались
      */
     @SneakyThrows
     public List<IndicationReadDto> getMonthlyIndications(Long id, Month month) {
@@ -156,6 +162,11 @@ public class UserService {
         return userRepository.getHistory(id);
     }
 
+    /**
+     * Ищет пользователя по id
+     * @param id    id пользователя
+     * @return      Возвращает пользователя по id, если он существует
+     */
     @SneakyThrows
     public Optional<UserReadDtoWithoutPassword> findById(Long id) {
         return userRepository.findById(id);

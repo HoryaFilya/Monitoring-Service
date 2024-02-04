@@ -12,6 +12,9 @@ import lombok.RequiredArgsConstructor;
 
 import java.sql.SQLException;
 
+/**
+ * Конфигурация Liquibase
+ */
 @RequiredArgsConstructor
 public class LiquibaseConfig {
 
@@ -20,6 +23,9 @@ public class LiquibaseConfig {
     private static final String CHANGELOG_FILE = PropertiesUtil.get("changelog.file");
     private static final String CREATE_SCHEMA_FOR_LIQUIBASE = "CREATE SCHEMA IF NOT EXISTS %s".formatted(SCHEMA_FOR_LIQUIBASE);
 
+    /**
+     * Запускает миграции
+     */
     public void startMigrations() {
         try (var connection = connectionManager.open();
              var statement = connection.createStatement()) {

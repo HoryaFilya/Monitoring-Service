@@ -6,12 +6,15 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
+/**
+ * Позволяет получить соединение с БД
+ */
 @RequiredArgsConstructor
 public class ConnectionManager {
 
-    private final String URL_KEY;
-    private final String USERNAME_KEY;
-    private final String PASSWORD_KEY;
+    private final String URL;
+    private final String USERNAME;
+    private final String PASSWORD;
 
     static {
         try {
@@ -21,12 +24,16 @@ public class ConnectionManager {
         }
     }
 
+    /**
+     * Позволяет получить соединение с БД
+     * @return      Соединение с БД
+     */
     public Connection open() {
         try {
             return DriverManager.getConnection(
-                    PropertiesUtil.get(URL_KEY),
-                    PropertiesUtil.get(USERNAME_KEY),
-                    PropertiesUtil.get(PASSWORD_KEY)
+                    URL,
+                    USERNAME,
+                    PASSWORD
             );
         } catch (SQLException e) {
             throw new RuntimeException(e);

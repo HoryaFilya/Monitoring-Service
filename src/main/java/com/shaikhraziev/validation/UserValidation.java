@@ -3,15 +3,10 @@ package com.shaikhraziev.validation;
 import com.shaikhraziev.dto.IndicationCreateEditDto;
 import com.shaikhraziev.dto.IndicationReadDto;
 import com.shaikhraziev.dto.UserCreateEditDto;
-import com.shaikhraziev.dto.UserReadDto;
 import com.shaikhraziev.entity.Action;
 import com.shaikhraziev.entity.Indication;
-import com.shaikhraziev.entity.User;
 import lombok.RequiredArgsConstructor;
 
-import java.time.LocalDate;
-import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -36,58 +31,15 @@ public class UserValidation {
 
     /**
      * Валидация username и password
-     * @param username      username, введенный пользователем
-     * @param password      password, введенный пользователем
-     * @return              Возвращает пользователя, если данные валидны
-     */
-    public Optional<UserCreateEditDto> loginAndPassword(String username, String password) {
-        Matcher usernameMatcher = usernamePattern.matcher(username);
-        Matcher passwordMatcher = passwordPattern.matcher(password);
-
-        if (!usernameMatcher.matches() || !passwordMatcher.matches()) {
-            return Optional.empty();
-        }
-        return Optional.of(UserCreateEditDto.builder()
-                .username(username)
-                .password(password)
-                .build());
-    }
-
-    /**
-     * Валидация username и password
-     * @param maybeUser     username и password, введенные пользователем
+     * @param user          username и password, введенные пользователем
      * @return              Возращает true, если данные валидны, иначе false
      */
-    public boolean isValidInput(UserCreateEditDto maybeUser) {
-        Optional<UserCreateEditDto> validUser = loginAndPassword(maybeUser.getUsername(), maybeUser.getPassword());
-        if (validUser.isEmpty()) {
+    public boolean isValidLoginAndPassword(UserCreateEditDto user) {
+        Matcher usernameMatcher = usernamePattern.matcher(user.getUsername());
+        Matcher passwordMatcher = passwordPattern.matcher(user.getPassword());
+
+        if (!usernameMatcher.matches() || !passwordMatcher.matches()) {
             System.out.println("Invalid username or password!");
-            return false;
-        }
-        return true;
-    }
-
-    /**
-     * Валидация действия
-     * @param action        Действие
-     * @return              Возращает false, если возникла ошибка, иначе true
-     */
-    public boolean isError(Action action) {
-        if (action.equals(ERROR)) {
-            System.out.println("An incorrect number was entered!");
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * Валидация актуальных показаний
-     * @param actualIndications     Актуальные показания
-     * @return                      Возращает true, если показания передавались, иначе false
-     */
-    public boolean isValidIndications(Optional<Indication> actualIndications) {
-        if (actualIndications.isEmpty()) {
-            System.out.println("Показания никогда не передавались!");
             return false;
         }
         return true;

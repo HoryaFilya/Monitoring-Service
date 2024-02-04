@@ -1,8 +1,9 @@
 package com.shaikhraziev.map;
 
 import com.shaikhraziev.dto.UserCreateEditDto;
-import com.shaikhraziev.entity.Role;
 import com.shaikhraziev.entity.User;
+
+import static com.shaikhraziev.entity.Role.USER;
 
 /**
  * Класс для преобразования UserCreateEditDto в User
@@ -18,7 +19,7 @@ public class UserCreateEditMapper {
         return User.builder()
                 .username(userDto.getUsername())
                 .password(userDto.getPassword())
-                .role(userDto.getRole())
+                .role(USER)
                 .build();
     }
 }

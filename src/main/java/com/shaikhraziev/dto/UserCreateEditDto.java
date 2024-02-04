@@ -10,6 +10,7 @@ import lombok.Value;
 @Value
 @Builder
 public class UserCreateEditDto {
+
     /**
      * username возможного пользователя
      */
@@ -19,9 +20,4 @@ public class UserCreateEditDto {
      * password возможного пользователя
      */
     String password;
-
-    /**
-     * Роль возможного пользователя
-     */
-    Role role;
 }

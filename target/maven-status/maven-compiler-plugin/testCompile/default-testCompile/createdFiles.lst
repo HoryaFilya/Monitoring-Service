@@ -3,8 +3,5 @@ com/shaikhraziev/map/UserCreateEditMapperTest.class
 com/shaikhraziev/service/UserServiceTest.class
 com/shaikhraziev/map/ActionAdminMapperTest.class
 com/shaikhraziev/map/ActionUserMapperTest.class
-com/shaikhraziev/util/ConnectionManagerTest.class
 com/shaikhraziev/validation/UserValidationTest.class
-com/shaikhraziev/PostgreSQLTest.class
 com/shaikhraziev/repository/UserRepositoryTest.class
-com/shaikhraziev/util/PropertiesUtilTest.class

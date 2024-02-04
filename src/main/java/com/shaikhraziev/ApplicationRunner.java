@@ -26,30 +26,22 @@ public class ApplicationRunner {
 
         UserValidation userValidation = new UserValidation();
 
-        ConnectionManager connectionManagerTest = new ConnectionManager(
-                PropertiesUtil.get(),
-                PropertiesUtil.get("db.username.test"),
-                PropertiesUtil.get("db.password.test")
-        );
-
-        ConnectionManager connectionManagerForApp = new ConnectionManager(
+        ConnectionManager connectionManager = new ConnectionManager(
                 PropertiesUtil.get("db.url"),
                 PropertiesUtil.get("db.username"),
                 PropertiesUtil.get("db.password")
         );
 
-        UserRepository userRepository = new UserRepository(connectionManagerForApp);
-        AuditRepository auditRepository = new AuditRepository(connectionManagerForApp);
+        UserRepository userRepository = new UserRepository(connectionManager);
+        AuditRepository auditRepository = new AuditRepository(connectionManager);
 
         UserService userService = new UserService(userRepository, userCreateEditMapper, userReadMapper, actionAdminMapper, userValidation, auditRepository);
 
         Application application = new Application(actionUserMapper, userService, userValidation, auditRepository);
 
-        LiquibaseConfig liquibaseConfigForTest = new LiquibaseConfig(connectionManagerTest);
-        LiquibaseConfig liquibaseConfigForApp = new LiquibaseConfig(connectionManagerForApp);
+        LiquibaseConfig liquibaseConfig = new LiquibaseConfig(connectionManager);
 
-        liquibaseConfigForTest.startMigrations();
-        liquibaseConfigForApp.startMigrations();
+        liquibaseConfig.startMigrations();
 
         application.run();
     }

@@ -32,10 +32,10 @@ public class UserRepository {
     private static final String FIND_HISTORY_ALL_USERS = "SELECT date, heating, hot_water, cold_water, users_id FROM monitoring.indication ORDER BY users_id";
 
     /**
-     * Сохраняет пользователя в хранилище
+     * Сохраняет пользователя в БД
      *
-     * @param user Пользователь
-     * @return Возращает сохраненного пользователя
+     * @param user  Пользователь
+     * @return      Возращает true при успешной регистрации
      */
     public boolean save(User user) throws SQLException {
         try (var connection = connectionManager.open();
@@ -51,8 +51,8 @@ public class UserRepository {
     /**
      * Ищет пользователя по username и password
      *
-     * @param userDto username и password, введенные пользователем
-     * @return Возвращает пользователя, если он существует
+     * @param userDto   username и password, введенные пользователем
+     * @return          Возвращает пользователя, если он существует
      */
     public Optional<User> findByUsernameAndPassword(UserCreateEditDto userDto) throws SQLException {
         try (var connection = connectionManager.open();
@@ -67,8 +67,8 @@ public class UserRepository {
     /**
      * Ищет пользователя по username
      *
-     * @param username username пользователя
-     * @return Возвращает пользователя, если он существует
+     * @param username      username пользователя
+     * @return              Возвращает пользователя, если он существует
      */
     public Optional<User> findByUsername(String username) throws SQLException {
         try (var connection = connectionManager.open();
@@ -82,9 +82,9 @@ public class UserRepository {
     /**
      * Ищет актуальные показания по id пользователя
      *
-     * @param id id пользователя
-     * @return Возвращает актуальные показания, если их передавали
-     * @throws SQLException SQLException
+     * @param id    id пользователя
+     * @return      Возвращает актуальные показания, если их передавали
+     * @throws      SQLException SQLException
      */
     public Optional<IndicationReadDto> getActualIndications(Long id) throws SQLException {
         try (var connection = connectionManager.open();
@@ -98,8 +98,8 @@ public class UserRepository {
     /**
      * Подает показания пользователя
      *
-     * @param id          id пользователя
-     * @param indications Переданные показания
+     * @param id            id пользователя
+     * @param indications   Переданные показания
      * @throws SQLException SQLException
      */
     public void uploadIndications(Long id, IndicationCreateEditDto indications) throws SQLException {
@@ -118,9 +118,9 @@ public class UserRepository {
     /**
      * Возращает показания за конкретный месяц
      *
-     * @param id    id пользователя
-     * @param month Месяц
-     * @return Возращает показания за конкретный месяц
+     * @param id        id пользователя
+     * @param month     Месяц
+     * @return          Возращает показания за конкретный месяц
      */
     public List<IndicationReadDto> getMonthlyIndications(Long id, Month month) throws SQLException {
         try (var connection = connectionManager.open();
@@ -137,8 +137,8 @@ public class UserRepository {
     /**
      * Возвращает историю подачи показаний пользователя
      *
-     * @param id id пользователя
-     * @return Возвращает историю подачи показаний пользователя
+     * @param id    id пользователя
+     * @return      Возвращает историю подачи показаний пользователя
      */
     public List<IndicationReadDto> getHistory(Long id) throws SQLException {
         try (var connection = connectionManager.open();
@@ -151,6 +151,11 @@ public class UserRepository {
         }
     }
 
+    /**
+     * Получает показания всех пользователей
+     * @return                  Возвращает показания всех пользователей
+     * @throws SQLException     SQLException
+     */
     public List<Indication> getHistory() throws SQLException {
         try (var connection = connectionManager.open();
              var statement = connection.createStatement()) {
@@ -160,6 +165,12 @@ public class UserRepository {
         }
     }
 
+    /**
+     * Ищет пользователя по id
+     * @param id                id пользователя
+     * @return                  Возвращает пользователя по id
+     * @throws SQLException     SQLException
+     */
     public Optional<UserReadDtoWithoutPassword> findById(Long id) throws SQLException {
         try (var connection = connectionManager.open();
              var preparedStatement = connection.prepareStatement(FIND_USER_BY_ID)) {
@@ -173,8 +184,8 @@ public class UserRepository {
     /**
      * Проверка, что показания не передавались в этом месяце
      *
-     * @param id id пользователя
-     * @return Возращает true - если показания уже передавались в этом месяце, иначе - false
+     * @param id    id пользователя
+     * @return      Возращает true - если показания уже передавались в этом месяце, иначе - false
      */
     public boolean indicationsAlreadyUploaded(Long id, Month currentMonth) throws SQLException {
         try (var connection = connectionManager.open();
@@ -189,8 +200,8 @@ public class UserRepository {
     /**
      * Создает пользователя по полученному ResultSet из БД
      *
-     * @param resultSet Результат SELECT запроса в БД, содержит пользователя
-     * @return Возвращает пользователя, если он существует
+     * @param resultSet     Результат SELECT запроса в БД, содержит пользователя
+     * @return              Возвращает пользователя, если он существует
      * @throws SQLException SQLException
      */
     private Optional<User> buildUser(ResultSet resultSet) throws SQLException {
@@ -206,6 +217,12 @@ public class UserRepository {
         return Optional.empty();
     }
 
+    /**
+     * Создает пользователя по полученному ResultSet из БД
+     * @param resultSet         Результат SELECT запроса в БД, содержит пользователя
+     * @return                  Возвращает пользователя, если он существует
+     * @throws SQLException     SQLException
+     */
     private Optional<UserReadDtoWithoutPassword> buildUseWithoutPassword(ResultSet resultSet) throws SQLException {
         if (resultSet.next()) {
             return Optional.ofNullable(UserReadDtoWithoutPassword.builder()
@@ -215,6 +232,12 @@ public class UserRepository {
         return Optional.empty();
     }
 
+    /**
+     * Создает показания по полученному ResultSet из БД
+     * @param resultSet         Результат SELECT запроса в БД, содержит показания
+     * @return                  Возвращает показания
+     * @throws SQLException     SQLException
+     */
     private List<IndicationReadDto> buildListIndicationsRead(ResultSet resultSet) throws SQLException {
         List<IndicationReadDto> listIndications = new ArrayList<>();
 
@@ -229,6 +252,12 @@ public class UserRepository {
         return listIndications;
     }
 
+    /**
+     * Создает показания по полученному ResultSet из БД
+     * @param resultSet     Результат SELECT запроса в БД, содержит показания
+     * @return              Возвращает показания
+     * @throws SQLException SQLException
+     */
     private Optional<IndicationReadDto> buildIndications(ResultSet resultSet) throws SQLException {
         if (resultSet.next()) {
             return Optional.ofNullable(IndicationReadDto.builder()
@@ -241,6 +270,12 @@ public class UserRepository {
         return Optional.empty();
     }
 
+    /**
+     * Создает показания по полученному ResultSet из БД
+     * @param resultSet     Результат SELECT запроса в БД, содержит показания
+     * @return              Возвращает показания
+     * @throws SQLException SQLException
+     */
     private List<Indication> buildListIndications(ResultSet resultSet) throws SQLException {
         List<Indication> listIndications = new ArrayList<>();
 

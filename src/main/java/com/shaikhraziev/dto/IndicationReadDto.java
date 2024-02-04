@@ -5,6 +5,9 @@ import lombok.Value;
 
 import java.time.LocalDate;
 
+/**
+ * Хранит показания, введенные пользователем, для чтения
+ */
 @Value
 @Builder
 public class IndicationReadDto {

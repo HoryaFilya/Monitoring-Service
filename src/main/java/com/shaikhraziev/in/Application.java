@@ -16,7 +16,6 @@ import lombok.SneakyThrows;
 import java.time.LocalDate;
 import java.time.Month;
 import java.util.List;
-import java.util.Optional;
 import java.util.Scanner;
 
 import static com.shaikhraziev.entity.Action.*;
@@ -68,6 +67,10 @@ public class Application {
         }
     }
 
+    /**
+     * Функционал авторизованного пользователя
+     * @param authorizationUser     Авторизованный пользователь
+     */
     @SneakyThrows
     private void authorizedUserManagement(UserReadDto authorizationUser) {
         while (true) {
@@ -135,6 +138,11 @@ public class Application {
         }
     }
 
+    /**
+     * Авторизация пользователя
+     * @param authorizationUser     Возможный авторизованный пользователь
+     * @return                      Возвращает true, если user зарегистрирован
+     */
     @SneakyThrows
     private boolean successfulAuthorization(UserReadDto authorizationUser) {
         if (authorizationUser == null) {
@@ -150,6 +158,11 @@ public class Application {
         }
     }
 
+    /**
+     * Выводит актуальные показания пользователя
+     * @param indication            Актуальные показания пользователя
+     * @param authorizationUser     Авторизованный пользователь
+     */
     @SneakyThrows
     private void printIndicationsAndAudit(IndicationReadDto indication, UserReadDto authorizationUser) {
         printActualIndications(indication);
@@ -194,7 +207,8 @@ public class Application {
     private void registrationProcedure() {
         UserCreateEditDto user = enteringUsernameAndPassword();
 
-        if (!userValidation.isValidInput(user)) return;
+        if (!userValidation.isValidLoginAndPassword(user)) return;
+
         userService.registration(user);
     }
 
@@ -246,7 +260,6 @@ public class Application {
         return UserCreateEditDto.builder()
                 .username(username)
                 .password(password)
-                .role(USER)
                 .build();
     }
 

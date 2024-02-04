@@ -125,6 +125,12 @@ public class AuditRepository {
         }
     }
 
+
+    /**
+     * Возвращает аудит действий всех пользователей
+     * @return                  Возвращает аудит действий всех пользователей
+     * @throws SQLException     SQLException
+     */
     public List<Audit> findAuditsAllUser() throws SQLException {
         try (var connection = connectionManager.open();
              var statement = connection.createStatement()) {
@@ -133,6 +139,12 @@ public class AuditRepository {
         }
     }
 
+    /**
+     * Обрабатывает SELECT запрос с БД
+     * @param resultSet         Ответ от БД
+     * @return                  Возвразает аудит действий всех пользователей
+     * @throws SQLException     SQLException
+     */
     private List<Audit> buildAudit(ResultSet resultSet) throws SQLException {
         List<Audit> audits = new ArrayList<>();
 

@@ -4,15 +4,15 @@
 
 Перейдите в директорию проекта: cd Monitoring-Service
 
-Перейдите на нужную ветку: git checkout task-1
+Перейдите на нужную ветку: git checkout task-2
 
-Сборка проекта: mvn clean install
+Поднимите контейнер с PostgreSQL: docker-compose up
+
+Сборка проекта: mvn clean package
 
 **Запуск проекта:**
 
-Перейдите в директорию сборки: cd target/
-
-Запустите приложение: java -cp monitoring-service-1.0-TASK.jar com.shaikhraziev.ApplicationRunner
+Запустите приложение: java -jar ./target/monitoring-service-1.0-TASK-jar-with-dependencies.jar
 
 
 **telegram:** @MishaShaikh

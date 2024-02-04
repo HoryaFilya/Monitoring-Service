@@ -1,9 +1,0 @@
-/home/horya/Рабочий стол/Monitoring-Service/src/test/java/com/shaikhraziev/UnitTestBase.java
-/home/horya/Рабочий стол/Monitoring-Service/src/test/java/com/shaikhraziev/map/UserCreateEditMapperTest.java
-/home/horya/Рабочий стол/Monitoring-Service/src/test/java/com/shaikhraziev/service/UserServiceTest.java
-/home/horya/Рабочий стол/Monitoring-Service/src/test/java/com/shaikhraziev/map/UserReadMapperTest.java
-/home/horya/Рабочий стол/Monitoring-Service/src/test/java/com/shaikhraziev/validation/UserValidationTest.java
-/home/horya/Рабочий стол/Monitoring-Service/src/test/java/com/shaikhraziev/map/ActionAdminMapperTest.java
-/home/horya/Рабочий стол/Monitoring-Service/src/test/java/com/shaikhraziev/map/ActionUserMapperTest.java
-/home/horya/Рабочий стол/Monitoring-Service/src/test/java/com/shaikhraziev/repository/UserRepositoryTest.java
-/home/horya/Рабочий стол/Monitoring-Service/src/test/java/com/shaikhraziev/repository/AuditRepositoryTest.java

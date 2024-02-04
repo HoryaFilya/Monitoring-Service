@@ -1,7 +1,0 @@
-com/shaikhraziev/map/UserReadMapperTest.class
-com/shaikhraziev/map/UserCreateEditMapperTest.class
-com/shaikhraziev/service/UserServiceTest.class
-com/shaikhraziev/map/ActionAdminMapperTest.class
-com/shaikhraziev/map/ActionUserMapperTest.class
-com/shaikhraziev/validation/UserValidationTest.class
-com/shaikhraziev/repository/UserRepositoryTest.class

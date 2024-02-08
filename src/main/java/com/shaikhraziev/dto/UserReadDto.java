@@ -1,5 +1,6 @@
 package com.shaikhraziev.dto;
 
+import com.shaikhraziev.entity.Role;
 import lombok.Builder;
 import lombok.Value;
 
@@ -23,4 +24,9 @@ public class UserReadDto {
      * password пользователя
      */
     String password;
+
+    /**
+     * Роль пользователя
+     */
+    Role role;
 }

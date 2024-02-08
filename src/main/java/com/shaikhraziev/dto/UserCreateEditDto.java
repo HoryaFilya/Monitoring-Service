@@ -1,5 +1,6 @@
 package com.shaikhraziev.dto;
 
+import com.shaikhraziev.entity.Role;
 import lombok.Builder;
 import lombok.Value;
 
@@ -9,6 +10,7 @@ import lombok.Value;
 @Value
 @Builder
 public class UserCreateEditDto {
+
     /**
      * username возможного пользователя
      */

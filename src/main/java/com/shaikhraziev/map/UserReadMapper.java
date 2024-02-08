@@ -18,6 +18,7 @@ public class UserReadMapper {
                 .id(user.getId())
                 .username(user.getUsername())
                 .password(user.getPassword())
+                .role(user.getRole())
                 .build();
     }
 }

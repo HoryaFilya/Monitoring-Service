@@ -1,27 +1,27 @@
 package com.shaikhraziev.in;
 
+import com.shaikhraziev.dto.IndicationCreateEditDto;
+import com.shaikhraziev.dto.IndicationReadDto;
 import com.shaikhraziev.dto.UserCreateEditDto;
 import com.shaikhraziev.dto.UserReadDto;
 import com.shaikhraziev.entity.Action;
-import com.shaikhraziev.entity.Indication;
 import com.shaikhraziev.entity.Phase;
-import com.shaikhraziev.map.ActionMapper;
-import com.shaikhraziev.map.MonthMapper;
-import com.shaikhraziev.service.AdminService;
-import com.shaikhraziev.service.AuditService;
+import com.shaikhraziev.map.ActionUserMapper;
+import com.shaikhraziev.repository.AuditRepository;
 import com.shaikhraziev.service.UserService;
 import com.shaikhraziev.validation.UserValidation;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 
 import java.time.LocalDate;
 import java.time.Month;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 import java.util.Scanner;
 
 import static com.shaikhraziev.entity.Action.*;
 import static com.shaikhraziev.entity.Phase.*;
+import static com.shaikhraziev.entity.Role.ADMIN;
+import static com.shaikhraziev.entity.Role.USER;
 
 /**
  * Главный класс приложения. Выполняется основной цикл программы.
@@ -30,12 +30,10 @@ import static com.shaikhraziev.entity.Phase.*;
 public class Application {
 
     private final Scanner scanner = new Scanner(System.in);
-    private final ActionMapper actionMapper;
-    private final MonthMapper monthMapper;
+    private final ActionUserMapper actionUserMapper;
     private final UserService userService;
-    private final AdminService adminService;
     private final UserValidation userValidation;
-    private final AuditService auditService;
+    private final AuditRepository auditRepository;
 
     /**
      * Основной метод программы. Запускает бесконечный цикл для обработки действий пользователя.
@@ -45,8 +43,6 @@ public class Application {
         while (true) {
             Action action = applicationMenuForNoAuthenticationUser();
 
-            if (userValidation.isError(action)) continue;
-
             switch (action) {
                 case REGISTRATION:
                     registrationProcedure();
@@ -54,68 +50,15 @@ public class Application {
 
                 case AUTHORIZATION:
                     UserCreateEditDto maybeUser = enteringUsernameAndPassword();
+                    UserReadDto authorizationUser = userService.authorization(maybeUser).orElse(null);
 
-                    if (!userValidation.isValidInput(maybeUser)) continue;
+                    if (!successfulAuthorization(authorizationUser)) continue;
 
-                    if (adminService.isAdmin(maybeUser)) {
-                        adminService.management();
-                        continue;
-                    }
+                    authorizedUserManagement(authorizationUser);
+                    continue;
 
-                    Optional<UserReadDto> maybeAuthorizationUser = userService.authorization(maybeUser);
-
-                    if (!userValidation.isValidUser(maybeAuthorizationUser)) continue;
-
-                    UserReadDto authorizationUser = maybeAuthorizationUser.get();
-                    System.out.println("%s has successfully logged in!".formatted(authorizationUser.getUsername()));
-                    auditService.authorization(authorizationUser.getUsername());
-
-                    while (true) {
-                        Action actionAuthorizationUser = applicationMenuForAuthorizationUser();
-
-                        if (actionAuthorizationUser.equals(LOGOUT)) {
-                            auditService.logout(authorizationUser.getUsername());
-                            break;
-                        }
-
-                        switch (actionAuthorizationUser) {
-                            case ACTUAL_INDICATIONS:
-                                Optional<Map<LocalDate, Indication>> actualIndications = userService.getActualIndications(authorizationUser.getUsername());
-                                if (!userValidation.isValidIndications(actualIndications)) continue;
-                                printActualIndications(actualIndications.get());
-                                auditService.getActualIndications(authorizationUser.getUsername());
-                                continue;
-
-                            case UPLOAD_INDICATIONS:
-                                Indication indications = enteringIndications();
-                                if (!userValidation.isValidUploadIndications(indications)) continue;
-                                userService.uploadIndications(authorizationUser.getUsername(), indications);
-                                continue;
-
-                            case MONTHLY_INDICATIONS:
-                                Month month = enteringMonth();
-                                if (month == null) continue;
-                                Optional<List<Indication>> maybeIndications = userService.getMonthlyIndications(authorizationUser.getUsername(), month);
-                                if (!userValidation.haveMonthlyIndications(maybeIndications)) continue;
-                                printMonthlyIndications(maybeIndications, month);
-                                auditService.getMonthlyIndications(authorizationUser.getUsername(), month);
-                                continue;
-
-                            case HISTORY:
-                                Optional<Map<LocalDate, Indication>> maybeHistory = userService.getHistory(authorizationUser.getUsername());
-                                if (!userValidation.haveHistory(maybeHistory)) continue;
-                                printHistory(maybeHistory);
-                                auditService.getHistory(authorizationUser.getUsername());
-                                continue;
-
-                            case EXIT:
-                                auditService.logout(authorizationUser.getUsername());
-                                userService.exit();
-
-                            default:
-                                continue;
-                        }
-                    }
+                case ERROR:
+                    System.out.println("An incorrect number was entered!");
                     continue;
 
                 case EXIT:
@@ -125,26 +68,128 @@ public class Application {
     }
 
     /**
-     * Выводит на консоль историю подачи показаний пользователя
-     * @param historyIndications            Содержит историю подачи показаний пользователя
+     * Функционал авторизованного пользователя
+     * @param authorizationUser     Авторизованный пользователь
      */
-    private void printHistory(Optional<Map<LocalDate, Indication>> historyIndications) {
-        Map<LocalDate, Indication> history = historyIndications.get();
-        history.forEach((key, value) -> System.out.printf("""
+    @SneakyThrows
+    private void authorizedUserManagement(UserReadDto authorizationUser) {
+        while (true) {
+            Action actionAuthorizationUser = applicationMenuForAuthorizationUser();
+
+            switch (actionAuthorizationUser) {
+                case ACTUAL_INDICATIONS:
+                    IndicationReadDto actualIndications = userService.getActualIndications(authorizationUser.getId()).orElse(null);
+
+                    if (actualIndications == null) {
+                        System.out.println("Indications was not transmitted!");
+                        continue;
+                    }
+
+                    printIndicationsAndAudit(actualIndications, authorizationUser);
+                    continue;
+
+                case UPLOAD_INDICATIONS:
+                    IndicationCreateEditDto indications = enteringIndications();
+
+                    if (!userValidation.isValidUploadIndications(indications)) continue;
+
+                    userService.uploadIndications(authorizationUser.getId(), indications);
+                    continue;
+
+                case MONTHLY_INDICATIONS:
+                    Month month = enteringMonth();
+
+                    if (month == null) continue;
+
+                    List<IndicationReadDto> monthlyIndications = userService.getMonthlyIndications(authorizationUser.getId(), month);
+
+                    if (monthlyIndications.isEmpty()) {
+                        System.out.println("Indications was not uploaded this month!");
+                        continue;
+                    }
+
+                    printMonthlyIndications(monthlyIndications, month);
+                    auditRepository.getMonthlyIndications(authorizationUser.getUsername(), month);
+                    continue;
+
+                case HISTORY:
+                    List<IndicationReadDto> maybeHistory = userService.getHistory(authorizationUser.getId());
+
+                    if (maybeHistory.isEmpty()) {
+                        System.out.println("Indications was never transmitted!");
+                        continue;
+                    }
+
+                    printHistory(maybeHistory);
+                    auditRepository.getHistory(authorizationUser.getUsername());
+                    continue;
+
+                case LOGOUT:
+                    auditRepository.logout(authorizationUser.getUsername());
+                    return;
+
+                case EXIT:
+                    auditRepository.logout(authorizationUser.getUsername());
+                    userService.exit();
+
+                case ERROR:
+                    System.out.println("An incorrect number was entered!");
+            }
+        }
+    }
+
+    /**
+     * Авторизация пользователя
+     * @param authorizationUser     Возможный авторизованный пользователь
+     * @return                      Возвращает true, если user зарегистрирован
+     */
+    @SneakyThrows
+    private boolean successfulAuthorization(UserReadDto authorizationUser) {
+        if (authorizationUser == null) {
+            System.out.println("There is no such user!");
+            return false;
+        } else if (authorizationUser.getRole().equals(ADMIN)) {
+            userService.adminControl();
+            return false;
+        } else {
+            System.out.println("%s has successfully logged in!".formatted(authorizationUser.getUsername()));
+            auditRepository.authorization(authorizationUser.getUsername());
+            return true;
+        }
+    }
+
+    /**
+     * Выводит актуальные показания пользователя
+     * @param indication            Актуальные показания пользователя
+     * @param authorizationUser     Авторизованный пользователь
+     */
+    @SneakyThrows
+    private void printIndicationsAndAudit(IndicationReadDto indication, UserReadDto authorizationUser) {
+        printActualIndications(indication);
+        auditRepository.getActualIndications(authorizationUser.getUsername());
+    }
+
+    /**
+     * Выводит на консоль историю подачи показаний пользователя
+     *
+     * @param history Содержит историю подачи показаний пользователя
+     */
+    private void printHistory(List<IndicationReadDto> history) {
+        history.forEach((indications -> System.out.printf("""
                 Дата: %s. Показания:
                     Отопление:      %d
                     Горячая вода:   %d
                     Холодная вода:  %d
-                """, key, value.getHeating(), value.getHotWater(), value.getColdWater()));
+                """, indications.getDate(), indications.getHeating(), indications.getHotWater(), indications.getColdWater())));
     }
 
     /**
      * Выводит на консоль показания пользователя за выбранный месяц
-     * @param maybeIndications              Показания пользователя за выбранный месяц
-     * @param month                         Месяц, выбранный пользователем
+     *
+     * @param monthlyIndications Показания пользователя за выбранный месяц
+     * @param month              Месяц, выбранный пользователем
      */
-    private void printMonthlyIndications(Optional<List<Indication>> maybeIndications, Month month) {
-        List<Indication> monthlyIndications = maybeIndications.get();
+    private void printMonthlyIndications(List<IndicationReadDto> monthlyIndications, Month month) {
         System.out.println("Показания за %s:".formatted(month.name()));
         monthlyIndications.forEach(indication -> {
                     System.out.printf("""
@@ -162,16 +207,15 @@ public class Application {
     private void registrationProcedure() {
         UserCreateEditDto user = enteringUsernameAndPassword();
 
-        if (!userValidation.isValidInput(user)) {
-            System.out.println("Invalid username or password!");
-            return;
-        }
+        if (!userValidation.isValidLoginAndPassword(user)) return;
+
         userService.registration(user);
     }
 
     /**
      * Меню приложения
-     * @return          Возвращает действие, выбранное пользователем
+     *
+     * @return Возвращает действие, выбранное пользователем
      */
     private Action applicationMenuForNoAuthenticationUser() {
         System.out.println("Сервис для подачи показаний счетчиков.");
@@ -185,7 +229,8 @@ public class Application {
 
     /**
      * Меню приложения для авторизованного пользователя
-     * @return          Возвращает действие, выбранное пользователем
+     *
+     * @return Возвращает действие, выбранное пользователем
      */
     private Action applicationMenuForAuthorizationUser() {
         System.out.println("Выберите действие:");
@@ -201,7 +246,8 @@ public class Application {
 
     /**
      * Метод для ввода пользователем username и password
-     * @return          Возвращает username и password, введенные пользователем
+     *
+     * @return Возвращает username и password, введенные пользователем
      */
     private UserCreateEditDto enteringUsernameAndPassword() {
         scanner.nextLine();
@@ -219,13 +265,14 @@ public class Application {
 
     /**
      * Конвертирует число, выбранное пользователем, в действие (в зависимости от стадии, на которой находится пользователь)
-     * @param phase         Стадия, на которой находится пользователь
-     * @return              Возвращает действие, выбранное пользователем
+     *
+     * @param phase Стадия, на которой находится пользователь
+     * @return Возвращает действие, выбранное пользователем
      */
     private Action getAction(Phase phase) {
         try {
             Integer actionNumber = scanner.nextInt();
-            return actionMapper.map(actionNumber, phase);
+            return actionUserMapper.map(actionNumber, phase);
         } catch (Exception ex) {
             scanner.nextLine();
             return ERROR;
@@ -234,9 +281,10 @@ public class Application {
 
     /**
      * Метод для ввода пользователем показаний со счетчиков
-     * @return          Возвращает показания, введенные пользователем
+     *
+     * @return Возвращает показания, введенные пользователем
      */
-    private Indication enteringIndications() {
+    private IndicationCreateEditDto enteringIndications() {
         try {
             System.out.println("Отопление:");
             Long heating = scanner.nextLong();
@@ -247,7 +295,12 @@ public class Application {
             System.out.println("Холодная вода:");
             Long coldWater = scanner.nextLong();
 
-            return new Indication(heating, hotWater, coldWater);
+            return IndicationCreateEditDto.builder()
+                    .date(LocalDate.now())
+                    .heating(heating)
+                    .hotWater(hotWater)
+                    .coldWater(coldWater)
+                    .build();
         } catch (Exception ex) {
             return null;
         }
@@ -255,33 +308,33 @@ public class Application {
 
     /**
      * Метод для ввода пользователем месяца
-     * @return          Возвращает месяц
+     *
+     * @return Возвращает месяц
      */
     private Month enteringMonth() {
         scanner.nextLine();
         System.out.println("Введите порядковый номер месяца:");
-        String monthNumber = scanner.nextLine();
-        Month month = monthMapper.map(monthNumber);
 
-        if (month == null) {
+        try {
+            int monthNumber = scanner.nextInt();
+            return Month.of(monthNumber);
+        } catch (Exception e) {
             System.out.println("An incorrect number was entered!");
             return null;
         }
-        return month;
     }
 
     /**
      * Выводит последние показания, отправленные пользователем
-     * @param actualIndications         Последние показания, отправленные пользователем
+     *
+     * @param indication Последние показания, отправленные пользователем
      */
-    private void printActualIndications(Map<LocalDate, Indication> actualIndications) {
-        LocalDate date = actualIndications.entrySet().stream().findFirst().get().getKey();
-        Indication indications = actualIndications.entrySet().stream().findFirst().get().getValue();
+    private void printActualIndications(IndicationReadDto indication) {
         System.out.printf("""
                 Актуальные показания на %s:
                     Отопление:      %d
                     Горячая вода:   %d
                     Холодная вода:  %d
-                """, date, indications.getHeating(), indications.getHotWater(), indications.getColdWater());
+                """, indication.getDate(), indication.getHeating(), indication.getHotWater(), indication.getColdWater());
     }
 }

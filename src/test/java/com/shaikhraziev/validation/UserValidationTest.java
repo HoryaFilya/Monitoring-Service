@@ -1,105 +1,59 @@
 package com.shaikhraziev.validation;
 
+import com.shaikhraziev.dto.IndicationCreateEditDto;
+import com.shaikhraziev.dto.IndicationReadDto;
 import com.shaikhraziev.dto.UserCreateEditDto;
-import com.shaikhraziev.dto.UserReadDto;
-import com.shaikhraziev.entity.Indication;
 import com.shaikhraziev.entity.User;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
 
-import static com.shaikhraziev.entity.Action.EXIT;
+import static com.shaikhraziev.entity.Role.USER;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class UserValidationTest {
 
-    private UserValidation userValidation = new UserValidation();
-    private User MISHA = new User(1L, "misha", "123q", new HashMap<>(), null);
-    private final Indication INDICATIONS = new Indication(100L, 200L, 300L);
-    private final Indication ACTUAL_INDICATIONS = new Indication(100L, 200L, 300L);
-    private final Indication TRANSMITTED_INDICATIONS = new Indication(200L, 300L, 400L);
-    private final LocalDate DATE = LocalDate.now();
-    private UserCreateEditDto USER_CREATE_EDIT_DTO = UserCreateEditDto.builder()
-            .username(MISHA.getUsername())
-            .password(MISHA.getPassword())
+    private final UserValidation userValidation = new UserValidation();
+    private final User TEST_USER = new User(null, "misha", "123q", USER);
+    private final UserCreateEditDto USER_CREATE_EDIT_DTO = UserCreateEditDto.builder()
+            .username(TEST_USER.getUsername())
+            .password(TEST_USER.getPassword())
+            .build();
+    private final IndicationReadDto ACTUAL_INDICATIONS = IndicationReadDto.builder()
+            .date(LocalDate.now())
+            .heating(100L)
+            .hotWater(200L)
+            .coldWater(300L)
             .build();
 
-    private UserReadDto USER_READ_DTO = UserReadDto.builder()
-            .id(1L)
-            .username("katya")
-            .password("123w")
+    private final IndicationCreateEditDto TRANSMITTED_INDICATIONS = IndicationCreateEditDto.builder()
+            .date(LocalDate.now())
+            .heating(105L)
+            .hotWater(205L)
+            .coldWater(305L)
             .build();
 
+    @DisplayName("should be valid login and password")
     @Test
-    void shouldValidateLoginAndPassword() {
-        var actualResult = userValidation.loginAndPassword(MISHA.getUsername(), MISHA.getPassword());
-        var expectedResult = USER_CREATE_EDIT_DTO;
-
-        assertThat(actualResult.get()).isEqualTo(expectedResult);
-    }
-
-    @Test
-    void shouldValidateInput() {
-        var actualResult = userValidation.isValidInput(USER_CREATE_EDIT_DTO);
+    void isValidLoginAndPassword() {
+        var actualResult = userValidation.isValidLoginAndPassword(USER_CREATE_EDIT_DTO);
 
         assertThat(actualResult).isTrue();
     }
 
+    @DisplayName("should be valid indications")
     @Test
-    void shouldValidateUser() {
-        var actualResult = userValidation.isValidUser(Optional.of(USER_READ_DTO));
+    void isValidUploadIndications() {
+        var actualResult = userValidation.isValidUploadIndications(TRANSMITTED_INDICATIONS);
 
         assertThat(actualResult).isTrue();
     }
 
+    @DisplayName("should be transmitted indications more than actual")
     @Test
-    void shouldNotBeError() {
-        var actualResult = userValidation.isError(EXIT);
-
-        assertThat(actualResult).isFalse();
-    }
-
-    @Test
-    void shouldNotBeValidIndications() {
-        var actualResult = userValidation.isValidIndications(Optional.empty());
-
-        assertThat(actualResult).isFalse();
-    }
-
-    @Test
-    void shouldValidateUploadIndications() {
-        var actualResult = userValidation.isValidUploadIndications(INDICATIONS);
-
-        assertThat(actualResult).isTrue();
-    }
-
-    @Test
-    void shouldBeTransmittedMoreThanActual() {
+    void isTransmittedMoreActual() {
         var actualResult = userValidation.isTransmittedMoreActual(ACTUAL_INDICATIONS, TRANSMITTED_INDICATIONS);
-
-        assertThat(actualResult).isTrue();
-    }
-
-    @Test
-    void shouldNotHaveUploadedIndications() {
-        var actualResult = userValidation.indicationsAlreadyUploaded(MISHA);
-
-        assertThat(actualResult).isFalse();
-    }
-
-    @Test
-    void shouldNotHaveMonthlyIndications() {
-        var actualResult = userValidation.haveMonthlyIndications(Optional.empty());
-
-        assertThat(actualResult).isFalse();
-    }
-
-    @Test
-    void shouldHaveHistory() {
-        var actualResult = userValidation.haveHistory(Optional.of(Map.of(DATE, INDICATIONS)));
 
         assertThat(actualResult).isTrue();
     }

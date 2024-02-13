@@ -3,15 +3,10 @@ package com.shaikhraziev.validation;
 import com.shaikhraziev.dto.IndicationCreateEditDto;
 import com.shaikhraziev.dto.IndicationReadDto;
 import com.shaikhraziev.dto.UserCreateEditDto;
-import com.shaikhraziev.entity.Action;
-import com.shaikhraziev.entity.Indication;
 import lombok.RequiredArgsConstructor;
 
-import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import static com.shaikhraziev.entity.Action.ERROR;
 
 /**
  * Класс для валидации введенной информации

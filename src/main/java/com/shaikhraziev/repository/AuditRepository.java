@@ -2,7 +2,6 @@ package com.shaikhraziev.repository;
 
 import com.shaikhraziev.entity.Audit;
 import com.shaikhraziev.util.ConnectionManager;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 import java.sql.Date;
@@ -12,7 +11,6 @@ import java.time.LocalDate;
 import java.time.Month;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * Репозиторий для аудита действий пользователя
@@ -110,7 +108,6 @@ public class AuditRepository {
         }
     }
 
-
     /**
      * Аудирование при получении истории подачи показаний
      *
@@ -124,7 +121,6 @@ public class AuditRepository {
             preparedStatement.executeUpdate();
         }
     }
-
 
     /**
      * Возвращает аудит действий всех пользователей

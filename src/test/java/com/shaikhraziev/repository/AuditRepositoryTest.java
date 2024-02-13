@@ -1,18 +1,12 @@
 package com.shaikhraziev.repository;
 
 import com.shaikhraziev.UnitTestBase;
-import com.shaikhraziev.entity.Audit;
-import com.shaikhraziev.entity.User;
 import com.shaikhraziev.util.ConnectionManager;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.*;
 
-import java.sql.SQLException;
 import java.time.LocalDate;
-import java.util.List;
 
-import static com.shaikhraziev.entity.Role.USER;
-import static java.time.Month.JANUARY;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)

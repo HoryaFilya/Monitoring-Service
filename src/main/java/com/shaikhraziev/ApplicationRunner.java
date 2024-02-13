@@ -1,10 +1,13 @@
 package com.shaikhraziev;
 
 import com.shaikhraziev.config.LiquibaseConfig;
-import com.shaikhraziev.in.Application;
+import com.shaikhraziev.in.*;
 import com.shaikhraziev.map.*;
+import com.shaikhraziev.repository.IndicationRepository;
 import com.shaikhraziev.repository.UserRepository;
 import com.shaikhraziev.repository.AuditRepository;
+import com.shaikhraziev.service.AuditService;
+import com.shaikhraziev.service.IndicationService;
 import com.shaikhraziev.service.UserService;
 import com.shaikhraziev.util.ConnectionManager;
 import com.shaikhraziev.util.PropertiesUtil;
@@ -32,12 +35,21 @@ public class ApplicationRunner {
                 PropertiesUtil.get("db.password")
         );
 
+        ActionUser actionUser = new ActionUser(actionUserMapper, actionAdminMapper);
+        Menu menu = new Menu(actionUser);
+        Input input = new Input();
+
         UserRepository userRepository = new UserRepository(connectionManager);
         AuditRepository auditRepository = new AuditRepository(connectionManager);
+        IndicationRepository indicationRepository = new IndicationRepository(connectionManager);
 
-        UserService userService = new UserService(userRepository, userCreateEditMapper, userReadMapper, actionAdminMapper, userValidation, auditRepository);
+        AuditService auditService = new AuditService(auditRepository);
+        UserService userService = new UserService(auditService, userRepository, userCreateEditMapper, userReadMapper);
+        IndicationService indicationService = new IndicationService(userService, auditService, userRepository, indicationRepository, userValidation);
 
-        Application application = new Application(actionUserMapper, userService, userValidation, auditRepository);
+        Output output = new Output(auditService);
+
+        Application application = new Application(userService, indicationService, auditService, menu, input, output, userValidation);
 
         LiquibaseConfig liquibaseConfig = new LiquibaseConfig(connectionManager);
 

@@ -1,46 +1,40 @@
-**Веб-сервис для подачи показаний счетчиков отопления, горячей и холодной воды**
+# Веб-сервис для подачи показаний счетчиков отопления, горячей и холодной воды
 
+## Сборка проекта:
 
-**Сборка проекта:**
+1. Склонируйте репозиторий: `git clone https://github.com/HoryaFilya/Monitoring-Service.git`
+2. Перейдите в директорию проекта: `cd Monitoring-Service`
+3. Перейдите на нужную ветку: `git checkout task-3`
+4. Поднимите контейнер с PostgreSQL: `docker-compose up`
 
-Склонируйте репозиторий: git clone https://github.com/HoryaFilya/Monitoring-Service.git
+## Запуск проекта:
 
-Перейдите в директорию проекта: cd Monitoring-Service
+- Запустите приложение: `./gradlew jettyRun`
 
-Перейдите на нужную ветку: git checkout task-3
+## Технологии:
 
-Поднимите контейнер с PostgreSQL: docker-compose up
+- Java 17
+- Docker
+- Lombok
+- JUnit 5, Mockito, AssertJ, Testcontainers
+- SQL и PostgreSQL
+- Liquibase
+- JDBC
+- Jackson
+- JWT
+- AspectJ
+- Jetty 11.0.17
+- Servlets
 
+## Эндпоинты:
 
-**Запуск проекта:**
-
-Запустите приложение: ./gradlew jettyRun
-
-
-**Технологии:**
-
-Java 17
-Docker
-Lombok
-JUnit 5, Mockito, AssertJ, Testcontainers
-SQL и PostgreSQL
-Liquibase
-JDBC
-Jackson
-JWT
-AspectJ
-Jetty 11.0.17
-Servlets
-
-
-**Эндпоинты:**
-
-1. Регистрация пользователя
-POST /registration
-{
-    "username": "test",
-    "password": "test"
-}
+1. Регистрация пользователя  
+   `POST /registration`
+   ```json
+   {
+       "username": "test",
+       "password": "test"
+   }
 
 2. Аутентификация пользователя
 POST /login

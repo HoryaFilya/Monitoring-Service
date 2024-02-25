@@ -43,9 +43,10 @@ public class IndicationService {
     @SneakyThrows
     public void uploadIndications(Long id, IndicationCreateEditDto transmittedIndications, IndicationReadDto actualIndications) {
         Month currentMonth = LocalDate.now().getMonth();
+        Integer currentYear = LocalDate.now().getYear();
 
         if (!userValidation.isTransmittedMoreActual(actualIndications, transmittedIndications) ||
-            indicationsAlreadyUploaded(id, currentMonth)) return;
+            indicationsAlreadyUploaded(id, currentMonth, currentYear)) return;
 
         indicationRepository.uploadIndications(id, transmittedIndications);
     }
@@ -58,8 +59,8 @@ public class IndicationService {
      * @return Возвращает true, если показания передавали в этом месяце
      */
     @SneakyThrows
-    public boolean indicationsAlreadyUploaded(Long id, Month currentMonth) {
-        return indicationRepository.indicationsAlreadyUploaded(id, currentMonth);
+    public boolean indicationsAlreadyUploaded(Long id, Month currentMonth, Integer currentYear) {
+        return indicationRepository.indicationsAlreadyUploaded(id, currentMonth, currentYear);
     }
 
     /**

@@ -30,6 +30,7 @@ public class IndicationRepositoryTest extends UnitTestBase {
     private final UserRepository userRepository = new UserRepository(connectionManager);
     private final User TEST_USER = new User(5L, "misha", "123q", USER);
     private final Long TEST_ADMIN_ID = 1L;
+    private final Integer CURRENT_YEAR = LocalDate.now().getYear();
     private final IndicationCreateEditDto TEST_TRANSMITTED_INDICATIONS = IndicationCreateEditDto.builder()
             .heating(100L)
             .hotWater(200L)
@@ -103,7 +104,7 @@ public class IndicationRepositoryTest extends UnitTestBase {
     @SneakyThrows
     @DisplayName("should get false because the admin cannot give indications")
     void indicationsAlreadyUploaded() {
-        var actualResult = indicationRepository.indicationsAlreadyUploaded(TEST_ADMIN_ID, FEBRUARY);
+        var actualResult = indicationRepository.indicationsAlreadyUploaded(TEST_ADMIN_ID, FEBRUARY, CURRENT_YEAR);
 
         assertThat(actualResult).isFalse();
     }

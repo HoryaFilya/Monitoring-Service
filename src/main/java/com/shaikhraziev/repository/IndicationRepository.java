@@ -26,7 +26,7 @@ public class IndicationRepository {
 
     private final ConnectionManager connectionManager;
     private static final String FIND_ACTUAL_INDICATIONS_BY_ID = "SELECT id, date, heating, hot_water, cold_water, users_id FROM monitoring.indication WHERE users_id = ? ORDER BY date LIMIT 1";
-    private static final String FIND_INDICATIONS_BY_MONTH = "SELECT id, date, heating, hot_water, cold_water, users_id FROM monitoring.indication WHERE users_id = ? AND DATE_PART('month', date) = ?";
+    private static final String FIND_INDICATIONS_BY_MONTH = "SELECT id, date, heating, hot_water, cold_water, users_id FROM monitoring.indication WHERE users_id = ? AND DATE_PART('month', date) = ? AND DATE_PART('year', date) = ?";
     private static final String FIND_HISTORY_INDICATIONS_BY_ID = "SELECT id, date, heating, hot_water, cold_water, users_id FROM monitoring.indication WHERE users_id = ?";
     private static final String UPLOAD_INDICATIONS = "INSERT INTO monitoring.indication(date, heating, hot_water, cold_water, users_id) VALUES(?, ?, ?, ?, ?)";
     private static final String FIND_HISTORY_ALL_USERS = "SELECT id, date, heating, hot_water, cold_water, users_id FROM monitoring.indication ORDER BY users_id";
@@ -125,11 +125,12 @@ public class IndicationRepository {
      * @param id id пользователя
      * @return Возращает true - если показания уже передавались в этом месяце, иначе - false
      */
-    public boolean indicationsAlreadyUploaded(Long id, Month currentMonth) throws SQLException {
+    public boolean indicationsAlreadyUploaded(Long id, Month currentMonth, Integer currentYear) throws SQLException {
         try (var connection = connectionManager.open();
              var preparedStatement = connection.prepareStatement(FIND_INDICATIONS_BY_MONTH)) {
             preparedStatement.setLong(1, id);
             preparedStatement.setInt(2, currentMonth.getValue());
+            preparedStatement.setInt(3, currentYear);
             var resultSet = preparedStatement.executeQuery();
             return resultSet.next();
         }

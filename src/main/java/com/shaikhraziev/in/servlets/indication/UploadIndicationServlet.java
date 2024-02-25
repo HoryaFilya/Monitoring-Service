@@ -42,6 +42,8 @@ public class UploadIndicationServlet extends HttpServlet {
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         try {
             IndicationCreateEditDto transmittedIndications = objectMapper.readValue(req.getInputStream(), IndicationCreateEditDto.class);
+            System.out.println("text " + transmittedIndications);
+            System.out.println("request: " + req.getInputStream());
 
             if (jwtService.authorizationUserRights(req.getCookies())) {
                 Cookie cookie = Arrays.stream(req.getCookies())
@@ -54,7 +56,7 @@ public class UploadIndicationServlet extends HttpServlet {
 
                 if (userValidation.isValidUploadIndications(transmittedIndications, actualIndications)) {
 
-                    if (!indicationService.indicationsAlreadyUploaded(id, LocalDate.now().getMonth())) {
+                    if (!indicationService.indicationsAlreadyUploaded(id, LocalDate.now().getMonth(), LocalDate.now().getYear())) {
                         indicationService.uploadIndications(id, transmittedIndications, actualIndications);
                         resp.setStatus(SC_OK);
                     } else {
@@ -70,13 +72,10 @@ public class UploadIndicationServlet extends HttpServlet {
                 resp.setStatus(SC_BAD_REQUEST);
                 resp.getOutputStream().write(objectMapper.writeValueAsBytes(NOT_ENOUGH_RIGHTS));
             }
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
+        } catch (Exception exception) {
+            resp.setStatus(SC_BAD_REQUEST);
+            resp.getOutputStream().write(objectMapper.writeValueAsBytes(INVALID_REQUEST));
+            System.out.println(exception.getMessage());
         }
-//        catch (Exception exception) {
-//            resp.setStatus(SC_BAD_REQUEST);
-//            resp.getOutputStream().write(objectMapper.writeValueAsBytes(INVALID_REQUEST));
-//            System.out.println(exception.getMessage());
-//        }
     }
 }

@@ -49,7 +49,7 @@ public class IndicationServiceTest {
             .build();
 
     private final Month CURRENT_MONTH = LocalDate.now().getMonth();
-
+    private final Integer CURRENT_YEAR = LocalDate.now().getYear();
     private final Indication TEST_INDICATIONS = Indication.builder()
             .id(TEST_USER.getId())
             .date(LocalDate.now())
@@ -118,7 +118,7 @@ public class IndicationServiceTest {
     @DisplayName("method must be called 1 time")
     void uploadIndications() {
         when(userValidation.isTransmittedMoreActual(TEST_INDICATIONS_READ_DTO, TEST_INDICATIONS_CREATE_EDIT_DTO)).thenReturn(true);
-        when(indicationRepository.indicationsAlreadyUploaded(TEST_USER.getId(), CURRENT_MONTH)).thenReturn(false);
+        when(indicationRepository.indicationsAlreadyUploaded(TEST_USER.getId(), CURRENT_MONTH, CURRENT_YEAR)).thenReturn(false);
 
         indicationService.uploadIndications(TEST_USER.getId(), TEST_INDICATIONS_CREATE_EDIT_DTO, TEST_INDICATIONS_READ_DTO);
 
@@ -129,9 +129,9 @@ public class IndicationServiceTest {
     @SneakyThrows
     @DisplayName("should return true, because the indications have already been transmitted")
     void indicationsAlreadyUploaded() {
-        when(indicationRepository.indicationsAlreadyUploaded(TEST_USER.getId(), CURRENT_MONTH)).thenReturn(true);
+        when(indicationRepository.indicationsAlreadyUploaded(TEST_USER.getId(), CURRENT_MONTH, CURRENT_YEAR)).thenReturn(true);
 
-        boolean actualResult = indicationService.indicationsAlreadyUploaded(TEST_USER.getId(), CURRENT_MONTH);
+        boolean actualResult = indicationService.indicationsAlreadyUploaded(TEST_USER.getId(), CURRENT_MONTH, CURRENT_YEAR);
 
         assertThat(actualResult).isTrue();
     }

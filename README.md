@@ -44,6 +44,13 @@
        "password": "test"
    }
 
+- для аутентификации в роли администратора:
+   ```json
+   {
+       "username": "admin",
+       "password": "admin"
+   }
+
 3. Выход из аккаунта
    `POST /logout`
 

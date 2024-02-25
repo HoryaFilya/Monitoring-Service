@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.shaikhraziev.repository.UserRepositoryTest" tests="4" skipped="0" failures="0" errors="0" timestamp="2024-02-25T07:00:41" hostname="horya-Katana-GF66-12UE" time="0.134">
+  <properties/>
+  <testcase name="should find the registered user" classname="com.shaikhraziev.repository.UserRepositoryTest" time="0.077"/>
+  <testcase name="should get admin by id = 1" classname="com.shaikhraziev.repository.UserRepositoryTest" time="0.012"/>
+  <testcase name="should be get user which was saved" classname="com.shaikhraziev.repository.UserRepositoryTest" time="0.02"/>
+  <testcase name="should find the registered user" classname="com.shaikhraziev.repository.UserRepositoryTest" time="0.023"/>
+  <system-out><![CDATA[Running Changeset: db/changelog/000-create-schema.xml::000-create-schema::Mikhail
+Running Changeset: db/changelog/001-create-sequence.xml::001-create-sequence-users::Mikhail
+Running Changeset: db/changelog/001-create-sequence.xml::001-create-sequence-indication::Mikhail
+Running Changeset: db/changelog/001-create-sequence.xml::001-create-sequence-audit::Mikhail
+Running Changeset: db/changelog/002-create-table.xml::002-create-table-users::Mikhail
+Running Changeset: db/changelog/002-create-table.xml::002-create-table-indication::Mikhail
+Running Changeset: db/changelog/002-create-table.xml::002-create-table-audit::Mikhail
+Running Changeset: db/changelog/003-insert-data.xml::003-insert-data-users::Mikhail
+
+UPDATE SUMMARY
+Run:                          8
+Previously run:               0
+Filtered out:                 0
+-------------------------------
+Total change sets:            8
+
+Liquibase: Update has been successful. Rows affected: 9
+Migration is completed successfully!
+]]></system-out>
+  <system-err><![CDATA[SLF4J: Failed to load class "org.slf4j.impl.StaticLoggerBinder".
+SLF4J: Defaulting to no-operation (NOP) logger implementation
+SLF4J: See http://www.slf4j.org/codes.html#StaticLoggerBinder for further details.
+февр. 25, 2024 12:00:41 PM liquibase.changelog
+INFO: Creating database history table with name: migration.databasechangelog
+февр. 25, 2024 12:00:41 PM liquibase.changelog
+INFO: Reading from migration.databasechangelog
+февр. 25, 2024 12:00:41 PM liquibase.lockservice
+INFO: Successfully acquired change log lock
+февр. 25, 2024 12:00:41 PM liquibase.command
+INFO: Using deploymentId: 8844441238
+февр. 25, 2024 12:00:41 PM liquibase.changelog
+INFO: Reading from migration.databasechangelog
+февр. 25, 2024 12:00:41 PM liquibase.changelog
+INFO: Custom SQL executed
+февр. 25, 2024 12:00:41 PM liquibase.changelog
+INFO: ChangeSet db/changelog/000-create-schema.xml::000-create-schema::Mikhail ran successfully in 5ms
+февр. 25, 2024 12:00:41 PM liquibase.changelog
+INFO: Sequence users_seq_id created
+февр. 25, 2024 12:00:41 PM liquibase.changelog
+INFO: ChangeSet db/changelog/001-create-sequence.xml::001-create-sequence-users::Mikhail ran successfully in 1ms
+февр. 25, 2024 12:00:41 PM liquibase.changelog
+INFO: Sequence indication_seq_id created
+февр. 25, 2024 12:00:41 PM liquibase.changelog
+INFO: ChangeSet db/changelog/001-create-sequence.xml::001-create-sequence-indication::Mikhail ran successfully in 1ms
+февр. 25, 2024 12:00:41 PM liquibase.changelog
+INFO: Sequence audit_seq_id created
+февр. 25, 2024 12:00:41 PM liquibase.changelog
+INFO: ChangeSet db/changelog/001-create-sequence.xml::001-create-sequence-audit::Mikhail ran successfully in 1ms
+февр. 25, 2024 12:00:41 PM liquibase.changelog
+INFO: Table users created
+февр. 25, 2024 12:00:41 PM liquibase.changelog
+INFO: ChangeSet db/changelog/002-create-table.xml::002-create-table-users::Mikhail ran successfully in 3ms
+февр. 25, 2024 12:00:41 PM liquibase.changelog
+INFO: Table indication created
+февр. 25, 2024 12:00:41 PM liquibase.changelog
+INFO: ChangeSet db/changelog/002-create-table.xml::002-create-table-indication::Mikhail ran successfully in 3ms
+февр. 25, 2024 12:00:41 PM liquibase.changelog
+INFO: Table audit created
+февр. 25, 2024 12:00:41 PM liquibase.changelog
+INFO: ChangeSet db/changelog/002-create-table.xml::002-create-table-audit::Mikhail ran successfully in 2ms
+февр. 25, 2024 12:00:41 PM liquibase.changelog
+INFO: New row inserted into users
+февр. 25, 2024 12:00:41 PM liquibase.changelog
+INFO: ChangeSet db/changelog/003-insert-data.xml::003-insert-data-users::Mikhail ran successfully in 2ms
+февр. 25, 2024 12:00:41 PM liquibase.util
+INFO: UPDATE SUMMARY
+февр. 25, 2024 12:00:41 PM liquibase.util
+INFO: Run:                          8
+февр. 25, 2024 12:00:41 PM liquibase.util
+INFO: Previously run:               0
+февр. 25, 2024 12:00:41 PM liquibase.util
+INFO: Filtered out:                 0
+февр. 25, 2024 12:00:41 PM liquibase.util
+INFO: -------------------------------
+февр. 25, 2024 12:00:41 PM liquibase.util
+INFO: Total change sets:            8
+февр. 25, 2024 12:00:41 PM liquibase.util
+INFO: Update summary generated
+февр. 25, 2024 12:00:41 PM liquibase.command
+INFO: Update command completed successfully.
+февр. 25, 2024 12:00:41 PM liquibase.lockservice
+INFO: Successfully released change log lock
+февр. 25, 2024 12:00:41 PM liquibase.command
+INFO: Command execution complete
+]]></system-err>
+</testsuite>

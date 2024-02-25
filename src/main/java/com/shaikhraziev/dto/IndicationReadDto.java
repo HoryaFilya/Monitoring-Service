@@ -3,8 +3,6 @@ package com.shaikhraziev.dto;
 import lombok.Builder;
 import lombok.Value;
 
-import java.time.LocalDate;
-
 /**
  * Хранит показания, введенные пользователем, для чтения
  */
@@ -13,9 +11,19 @@ import java.time.LocalDate;
 public class IndicationReadDto {
 
     /**
+     * Идентификатор показаний
+     */
+    Long id;
+
+    /**
+     * Имя пользователя
+     */
+    String username;
+
+    /**
      * Дата подачи показаний
      */
-    LocalDate date;
+    String date;
 
     /**
      * Значение с счетчика отопления

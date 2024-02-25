@@ -1,21 +1,15 @@
 package com.shaikhraziev.dto;
 
-import lombok.Builder;
-import lombok.Value;
-
-import java.time.LocalDate;
+import lombok.*;
 
 /**
  * Хранит показания, введенные пользователем
  */
-@Value
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 @Builder
 public class IndicationCreateEditDto {
-
-    /**
-     * Дата подачи показаний
-     */
-    LocalDate date;
 
     /**
      * Значение с счетчика отопления

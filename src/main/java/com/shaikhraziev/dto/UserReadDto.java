@@ -21,11 +21,6 @@ public class UserReadDto {
     String username;
 
     /**
-     * password пользователя
-     */
-    String password;
-
-    /**
      * Роль пользователя
      */
     Role role;

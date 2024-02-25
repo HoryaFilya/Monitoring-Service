@@ -42,11 +42,11 @@ public class AuditRepository {
      *
      * @param username username пользователя
      */
-    public void authorization(String username) throws SQLException {
+    public void authentication(String username) throws SQLException {
         try (var connection = connectionManager.open();
              var preparedStatement = connection.prepareStatement(AUDIT)) {
             preparedStatement.setDate(1, Date.valueOf(LocalDate.now()));
-            preparedStatement.setString(2, "Пользователь %s авторизовался.".formatted(username));
+            preparedStatement.setString(2, "Пользователь %s аутентифицировался.".formatted(username));
             preparedStatement.executeUpdate();
         }
     }
@@ -84,11 +84,11 @@ public class AuditRepository {
      *
      * @param username username пользователя
      */
-    public void uploadIndications(String username) throws SQLException {
+    public void uploadIndications(String username, Month month) throws SQLException {
         try (var connection = connectionManager.open();
              var preparedStatement = connection.prepareStatement(AUDIT)) {
             preparedStatement.setDate(1, Date.valueOf(LocalDate.now()));
-            preparedStatement.setString(2, "Пользователь %s подал показания.".formatted(username));
+            preparedStatement.setString(2, "Пользователь %s подал показания за %s".formatted(username, month));
             preparedStatement.executeUpdate();
         }
     }

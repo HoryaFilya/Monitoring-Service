@@ -1,7 +1,8 @@
 package com.shaikhraziev.repository;
 
+import com.shaikhraziev.aop.annotations.Audit;
+import com.shaikhraziev.aop.annotations.Loggable;
 import com.shaikhraziev.dto.IndicationCreateEditDto;
-import com.shaikhraziev.dto.IndicationReadDto;
 import com.shaikhraziev.entity.Indication;
 import com.shaikhraziev.util.ConnectionManager;
 import lombok.RequiredArgsConstructor;
@@ -19,24 +20,26 @@ import java.util.Optional;
  * Репозиторий для работы с показаниями пользователя
  */
 @RequiredArgsConstructor
+@Loggable
+@Audit
 public class IndicationRepository {
 
     private final ConnectionManager connectionManager;
-    private static final String FIND_ACTUAL_INDICATIONS_BY_ID = "SELECT date, heating, hot_water, cold_water, users_id FROM monitoring.indication WHERE users_id = ? ORDER BY date LIMIT 1";
-    private static final String FIND_INDICATIONS_BY_MONTH = "SELECT date, heating, hot_water, cold_water FROM monitoring.indication WHERE users_id = ? AND DATE_PART('month', date) = ?";
-    private static final String FIND_HISTORY_INDICATIONS_BY_ID = "SELECT date, heating, hot_water, cold_water FROM monitoring.indication WHERE users_id = ?";
+    private static final String FIND_ACTUAL_INDICATIONS_BY_ID = "SELECT id, date, heating, hot_water, cold_water, users_id FROM monitoring.indication WHERE users_id = ? ORDER BY date LIMIT 1";
+    private static final String FIND_INDICATIONS_BY_MONTH = "SELECT id, date, heating, hot_water, cold_water, users_id FROM monitoring.indication WHERE users_id = ? AND DATE_PART('month', date) = ?";
+    private static final String FIND_HISTORY_INDICATIONS_BY_ID = "SELECT id, date, heating, hot_water, cold_water, users_id FROM monitoring.indication WHERE users_id = ?";
     private static final String UPLOAD_INDICATIONS = "INSERT INTO monitoring.indication(date, heating, hot_water, cold_water, users_id) VALUES(?, ?, ?, ?, ?)";
-    private static final String FIND_HISTORY_ALL_USERS = "SELECT date, heating, hot_water, cold_water, users_id FROM monitoring.indication ORDER BY users_id";
+    private static final String FIND_HISTORY_ALL_USERS = "SELECT id, date, heating, hot_water, cold_water, users_id FROM monitoring.indication ORDER BY users_id";
 
 
     /**
      * Ищет актуальные показания по id пользователя
      *
-     * @param id    id пользователя
-     * @return      Возвращает актуальные показания, если их передавали
+     * @param id id пользователя
+     * @return Возвращает актуальные показания, если их передавали
      * @throws SQLException SQLException
      */
-    public Optional<IndicationReadDto> getActualIndications(Long id) throws SQLException {
+    public Optional<Indication> getActualIndications(Long id) throws SQLException {
         try (var connection = connectionManager.open();
              var preparedStatement = connection.prepareStatement(FIND_ACTUAL_INDICATIONS_BY_ID)) {
             preparedStatement.setLong(1, id);
@@ -48,14 +51,14 @@ public class IndicationRepository {
     /**
      * Подает показания пользователя
      *
-     * @param id            id пользователя
-     * @param indications   Переданные показания
+     * @param id          id пользователя
+     * @param indications Переданные показания
      * @throws SQLException SQLException
      */
     public void uploadIndications(Long id, IndicationCreateEditDto indications) throws SQLException {
         try (var connection = connectionManager.open();
              var preparedStatement = connection.prepareStatement(UPLOAD_INDICATIONS)) {
-            preparedStatement.setDate(1, Date.valueOf(indications.getDate()));
+            preparedStatement.setDate(1, Date.valueOf(LocalDate.now()));
             preparedStatement.setLong(2, indications.getHeating());
             preparedStatement.setLong(3, indications.getHotWater());
             preparedStatement.setLong(4, indications.getColdWater());
@@ -68,11 +71,11 @@ public class IndicationRepository {
     /**
      * Возращает показания за конкретный месяц
      *
-     * @param id        id пользователя
-     * @param month     Месяц
-     * @return          Возращает показания за конкретный месяц
+     * @param id    id пользователя
+     * @param month Месяц
+     * @return Возращает показания за конкретный месяц
      */
-    public List<IndicationReadDto> getMonthlyIndications(Long id, Month month) throws SQLException {
+    public List<Indication> getMonthlyIndications(Long id, Month month) throws SQLException {
         try (var connection = connectionManager.open();
              var preparedStatement = connection.prepareStatement(FIND_INDICATIONS_BY_MONTH)) {
             preparedStatement.setLong(1, id);
@@ -80,31 +83,32 @@ public class IndicationRepository {
 
             var resultSet = preparedStatement.executeQuery();
 
-            return buildListIndicationsRead(resultSet);
+            return buildListIndications(resultSet);
         }
     }
 
     /**
      * Возвращает историю подачи показаний пользователя
      *
-     * @param id    id пользователя
-     * @return      Возвращает историю подачи показаний пользователя
+     * @param id id пользователя
+     * @return Возвращает историю подачи показаний пользователя
      */
-    public List<IndicationReadDto> getHistory(Long id) throws SQLException {
+    public List<Indication> getHistory(Long id) throws SQLException {
         try (var connection = connectionManager.open();
              var preparedStatement = connection.prepareStatement(FIND_HISTORY_INDICATIONS_BY_ID)) {
             preparedStatement.setLong(1, id);
 
             var resultSet = preparedStatement.executeQuery();
 
-            return buildListIndicationsRead(resultSet);
+            return buildListIndications(resultSet);
         }
     }
 
     /**
      * Получает показания всех пользователей
-     * @return                  Возвращает показания всех пользователей
-     * @throws SQLException     SQLException
+     *
+     * @return Возвращает показания всех пользователей
+     * @throws SQLException SQLException
      */
     public List<Indication> getHistory() throws SQLException {
         try (var connection = connectionManager.open();
@@ -118,8 +122,8 @@ public class IndicationRepository {
     /**
      * Проверка, что показания не передавались в этом месяце
      *
-     * @param id    id пользователя
-     * @return      Возращает true - если показания уже передавались в этом месяце, иначе - false
+     * @param id id пользователя
+     * @return Возращает true - если показания уже передавались в этом месяце, иначе - false
      */
     public boolean indicationsAlreadyUploaded(Long id, Month currentMonth) throws SQLException {
         try (var connection = connectionManager.open();
@@ -133,37 +137,20 @@ public class IndicationRepository {
 
     /**
      * Создает показания по полученному ResultSet из БД
-     * @param resultSet         Результат SELECT запроса в БД, содержит показания
-     * @return                  Возвращает показания
-     * @throws SQLException     SQLException
-     */
-    private List<IndicationReadDto> buildListIndicationsRead(ResultSet resultSet) throws SQLException {
-        List<IndicationReadDto> listIndications = new ArrayList<>();
-
-        while (resultSet.next()) {
-            listIndications.add(IndicationReadDto.builder()
-                    .date(resultSet.getObject("date", LocalDate.class))
-                    .heating(resultSet.getObject("heating", Long.class))
-                    .hotWater(resultSet.getObject("hot_water", Long.class))
-                    .coldWater(resultSet.getObject("cold_water", Long.class))
-                    .build());
-        }
-        return listIndications;
-    }
-
-    /**
-     * Создает показания по полученному ResultSet из БД
-     * @param resultSet     Результат SELECT запроса в БД, содержит показания
-     * @return              Возвращает показания
+     *
+     * @param resultSet Результат SELECT запроса в БД, содержит показания
+     * @return Возвращает показания
      * @throws SQLException SQLException
      */
-    private Optional<IndicationReadDto> buildIndications(ResultSet resultSet) throws SQLException {
+    private Optional<Indication> buildIndications(ResultSet resultSet) throws SQLException {
         if (resultSet.next()) {
-            return Optional.ofNullable(IndicationReadDto.builder()
+            return Optional.ofNullable(Indication.builder()
+                    .id(resultSet.getObject("id", Long.class))
                     .date(resultSet.getObject("date", LocalDate.class))
                     .heating(resultSet.getObject("heating", Long.class))
                     .hotWater(resultSet.getObject("hot_water", Long.class))
                     .coldWater(resultSet.getObject("cold_water", Long.class))
+                    .usersId(resultSet.getObject("users_id", Long.class))
                     .build());
         }
         return Optional.empty();
@@ -171,8 +158,9 @@ public class IndicationRepository {
 
     /**
      * Создает показания по полученному ResultSet из БД
-     * @param resultSet     Результат SELECT запроса в БД, содержит показания
-     * @return              Возвращает показания
+     *
+     * @param resultSet Результат SELECT запроса в БД, содержит показания
+     * @return Возвращает показания
      * @throws SQLException SQLException
      */
     private List<Indication> buildListIndications(ResultSet resultSet) throws SQLException {
@@ -180,6 +168,7 @@ public class IndicationRepository {
 
         while (resultSet.next()) {
             listIndications.add(Indication.builder()
+                    .id(resultSet.getObject("id", Long.class))
                     .date(resultSet.getObject("date", LocalDate.class))
                     .heating(resultSet.getObject("heating", Long.class))
                     .hotWater(resultSet.getObject("hot_water", Long.class))

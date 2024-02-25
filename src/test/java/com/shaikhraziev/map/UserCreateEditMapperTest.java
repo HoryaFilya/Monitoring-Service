@@ -2,10 +2,8 @@ package com.shaikhraziev.map;
 
 import com.shaikhraziev.dto.UserCreateEditDto;
 import com.shaikhraziev.entity.User;
-import org.junit.Ignore;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-
-import java.util.HashMap;
 
 import static com.shaikhraziev.entity.Role.USER;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -19,9 +17,10 @@ class UserCreateEditMapperTest {
             .build();
 
     @Test
-    void shouldMapUserDtoToUser() {
-        var actualResult = userCreateEditMapper.map(USER_DTO);
-        var expectedResult = new User(null, "katya", "123w", USER);
+    @DisplayName("should map UserCreateEditDto to User")
+    void map() {
+        User actualResult = userCreateEditMapper.map(USER_DTO);
+        User expectedResult = new User(null, "katya", "123w", USER);
 
         assertThat(actualResult).isEqualTo(expectedResult);
     }

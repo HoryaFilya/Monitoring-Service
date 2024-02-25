@@ -2,7 +2,6 @@ package com.shaikhraziev.service;
 
 import com.shaikhraziev.dto.UserCreateEditDto;
 import com.shaikhraziev.dto.UserReadDto;
-import com.shaikhraziev.dto.UserReadDtoWithoutPassword;
 import com.shaikhraziev.entity.User;
 import com.shaikhraziev.map.UserCreateEditMapper;
 import com.shaikhraziev.map.UserReadMapper;
@@ -32,73 +31,66 @@ class UserServiceTest {
     private UserCreateEditMapper userCreateEditMapper;
     @Mock
     private UserReadMapper userReadMapper;
-    @Mock
-    private AuditService auditService;
-
-    private final UserCreateEditDto USER_CREATE_EDIT_DTO = UserCreateEditDto.builder()
-            .username("misha")
-            .password("123q")
-            .build();
-
-    private final UserReadDto USER_READ_DTO = UserReadDto.builder()
-            .username("misha")
-            .password("123q")
-            .build();
-
-    private final UserReadDtoWithoutPassword USER_READ_DTO_WITHOUT_PASSWORD = UserReadDtoWithoutPassword.builder()
-            .username("misha")
-            .build();
 
     private final User TEST_USER = User.builder()
+            .id(5L)
             .username("misha")
             .password("123q")
             .role(USER)
             .build();
 
-    private final String TEST_USERNAME = "misha";
+    private final UserCreateEditDto TEST_USER_CREATE_EDIT_DTO = UserCreateEditDto.builder()
+            .username("misha")
+            .password("123q")
+            .build();
+
+    private final UserReadDto TEST_USER_READ_DTO = UserReadDto.builder()
+            .id(TEST_USER.getId())
+            .username(TEST_USER.getUsername())
+            .role(TEST_USER.getRole())
+            .build();
 
     @Test
     @SneakyThrows
     @DisplayName("should be successful registration user")
     void registration() {
-        when(userCreateEditMapper.map(USER_CREATE_EDIT_DTO)).thenReturn(TEST_USER);
-        when(userRepository.findByUsername(TEST_USER.getUsername())).thenReturn(Optional.empty());
-        when(userRepository.save(TEST_USER)).thenReturn(true);
+        when(userCreateEditMapper.map(TEST_USER_CREATE_EDIT_DTO)).thenReturn(TEST_USER);
+        when(userRepository.save(TEST_USER)).thenReturn(TEST_USER);
+        when(userReadMapper.map(TEST_USER)).thenReturn(TEST_USER_READ_DTO);
 
-        var actualResult = (userService.registration(USER_CREATE_EDIT_DTO));
+        UserReadDto actualResult = (userService.registration(TEST_USER_CREATE_EDIT_DTO));
 
-        assertThat(actualResult).isTrue();
+        assertThat(actualResult).isEqualTo(TEST_USER_READ_DTO);
 
         verify(userRepository).save(TEST_USER);
-        verify(auditService).registration(TEST_USER.getUsername());
     }
 
     @Test
     @SneakyThrows
     @DisplayName("should be authorize user")
     void authorization() {
-        when(userRepository.findByUsernameAndPassword(USER_CREATE_EDIT_DTO)).thenReturn(Optional.of(TEST_USER));
-        when(userReadMapper.map(TEST_USER)).thenReturn(USER_READ_DTO);
+        when(userRepository.findByUsernameAndPassword(TEST_USER_CREATE_EDIT_DTO)).thenReturn(Optional.of(TEST_USER));
+        when(userReadMapper.map(TEST_USER)).thenReturn(TEST_USER_READ_DTO);
 
-        var actualResult = userService.authorization(USER_CREATE_EDIT_DTO);
+        Optional<UserReadDto> actualResult = userService.authorization(TEST_USER_CREATE_EDIT_DTO);
 
         assertThat(actualResult).isPresent();
-        assertThat(actualResult.get()).isEqualTo(USER_READ_DTO);
+        assertThat(actualResult.get()).isEqualTo(TEST_USER_READ_DTO);
     }
 
     @Test
     @SneakyThrows
     @DisplayName("should be successful search by name")
     void findByUsername() {
-        when(userRepository.findByUsername(TEST_USERNAME)).thenReturn(Optional.of(TEST_USER));
-        when(userReadMapper.map(TEST_USER)).thenReturn(USER_READ_DTO);
+        when(userRepository.findByUsername(TEST_USER.getUsername())).thenReturn(Optional.of(TEST_USER));
+        when(userReadMapper.map(TEST_USER)).thenReturn(TEST_USER_READ_DTO);
 
-        var actualResult = userService.findByUsername(TEST_USERNAME);
+        Optional<UserReadDto> actualResult = userService.findByUsername(TEST_USER.getUsername());
 
         assertThat(actualResult).isPresent();
-        assertThat(actualResult.get()).isEqualTo(USER_READ_DTO);
+        assertThat(actualResult.get()).isEqualTo(TEST_USER_READ_DTO);
 
-        verify(userRepository, times(1)).findByUsername(TEST_USERNAME);
+        verify(userRepository, times(1)).findByUsername(TEST_USER.getUsername());
         verify(userReadMapper, times(1)).map(TEST_USER);
     }
 
@@ -106,12 +98,12 @@ class UserServiceTest {
     @SneakyThrows
     @DisplayName("should be successful search by id")
     void findById() {
-        when(userRepository.findById(TEST_USER.getId())).thenReturn(Optional.of(USER_READ_DTO_WITHOUT_PASSWORD));
+        when(userRepository.findById(TEST_USER.getId())).thenReturn(Optional.of(TEST_USER));
 
-        var actualResult = userService.findById(TEST_USER.getId());
+        Optional<User> actualResult = userService.findById(TEST_USER.getId());
 
         assertThat(actualResult).isPresent();
-        assertThat(actualResult.get()).isEqualTo(USER_READ_DTO_WITHOUT_PASSWORD);
+        assertThat(actualResult.get()).isEqualTo(TEST_USER);
 
         verify(userRepository, times(1)).findById(TEST_USER.getId());
     }

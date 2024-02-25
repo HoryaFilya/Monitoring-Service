@@ -37,37 +37,39 @@
    }
 
 2. Аутентификация пользователя
-POST /login
-{
-    "username": "test",
-    "password": "test"
-}
+   `POST /login`
+   ```json
+   {
+       "username": "test",
+       "password": "test"
+   }
 
 3. Выход из аккаунта
-POST /logout
+   `POST /logout`
 
 4. Получение актуальных показаний счетчиков
-GET /indications/actual/{id}
+   `GET /indications/actual/{id}`
 
 5. Получение истории подачи показаний счетчиков
-GET /indications/history/{id}
+   `GET /indications/history/{id}`
 
 6. Получение показаний счетчиков за конкретный месяц
-GET /indications/{month_number}/{id}
+   `GET /indications/{month_number}/{id}`
 
 7. Подача показаний
-POST /indications
-{
-    "heating": 100,
-    "hotWater": 200,
-    "coldWater": 300
-}
+   `POST /indications`
+   ```json
+   {
+       "heating": 100,
+       "hotWater": 200,
+       "coldWater": 300
+   }
 
 8. Получение аудита действий пользователей
-GET /admin/audits
+   `GET /admin/audits`
 
 9. Получение истории подачи показаний счетчиков пользователей
-GET /admin/indications
+   `GET /admin/indications`
 
 
 **telegram:** @MishaShaikh

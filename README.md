@@ -58,7 +58,7 @@
    `GET /indications/history/{id}`
 
 6. Получение показаний счетчиков за конкретный месяц
-   `GET /indications/{month_number}/{id}`
+   `GET /indications/month/{month_number}/{id}`
 
 7. Подача показаний
    `POST /indications`

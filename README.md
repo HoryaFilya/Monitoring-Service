@@ -79,4 +79,5 @@
    `GET /admin/indications`
 
 
-**telegram:** @MishaShaikh
+## Telegram:
+- @MishaShaikh

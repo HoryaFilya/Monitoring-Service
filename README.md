@@ -1,17 +1,14 @@
 # Веб-сервис для подачи показаний счетчиков отопления, горячей и холодной воды
 
-## Сборка проекта:
+## Инструкция по запуску
 
 1. Склонируйте репозиторий: `git clone https://github.com/HoryaFilya/Monitoring-Service.git`
 2. Перейдите в директорию проекта: `cd Monitoring-Service`
 3. Перейдите на нужную ветку: `git checkout task-3`
 4. Поднимите контейнер с PostgreSQL: `docker-compose up`
+4. Запустите приложение: `./gradlew jettyRun`
 
-## Запуск проекта:
-
-- Запустите приложение: `./gradlew jettyRun`
-
-## Технологии:
+## Технологии
 
 - Java 17
 - Docker
@@ -26,7 +23,7 @@
 - Jetty 11.0.17
 - Servlets
 
-## Эндпоинты:
+## Эндпоинты
 
 1. Регистрация пользователя  
    `POST /registration`
@@ -44,7 +41,7 @@
        "password": "test"
    }
 
-- для аутентификации в роли администратора:
+- в роли администратора:
    ```json
    {
        "username": "admin",
@@ -79,5 +76,5 @@
    `GET /admin/indications`
 
 
-## Telegram:
+## Telegram
 - @MishaShaikh

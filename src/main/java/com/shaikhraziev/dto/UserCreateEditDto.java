@@ -1,13 +1,13 @@
 package com.shaikhraziev.dto;
 
-import com.shaikhraziev.entity.Role;
-import lombok.Builder;
-import lombok.Value;
+import lombok.*;
 
 /**
  * Хранит username и password, введенные пользователем
  */
-@Value
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 @Builder
 public class UserCreateEditDto {
 

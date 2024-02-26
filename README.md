@@ -1,18 +1,80 @@
-**Сборка проекта:**
+# Веб-сервис для подачи показаний счетчиков отопления, горячей и холодной воды
 
-Клонирование репозитория: git clone https://github.com/HoryaFilya/Monitoring-Service.git
+## Инструкция по запуску
 
-Перейдите в директорию проекта: cd Monitoring-Service
+1. Склонируйте репозиторий: `git clone https://github.com/HoryaFilya/Monitoring-Service.git`
+2. Перейдите в директорию проекта: `cd Monitoring-Service`
+3. Перейдите на нужную ветку: `git checkout task-3`
+4. Поднимите контейнер с PostgreSQL: `docker-compose up`
+4. Запустите приложение: `./gradlew jettyRun`
 
-Перейдите на нужную ветку: git checkout task-2
+## Технологии
 
-Поднимите контейнер с PostgreSQL: docker-compose up
+- Java 17
+- Docker
+- Lombok
+- JUnit 5, Mockito, AssertJ, Testcontainers
+- SQL и PostgreSQL
+- Liquibase
+- JDBC
+- Jackson
+- JWT
+- AspectJ
+- Jetty 11.0.17
+- Servlets
 
-Сборка проекта: mvn clean package
+## Эндпоинты
 
-**Запуск проекта:**
+1. Регистрация пользователя  
+   `POST /registration`
+   ```json
+   {
+       "username": "test",
+       "password": "test"
+   }
 
-Запустите приложение: java -jar ./target/monitoring-service-1.0-TASK-jar-with-dependencies.jar
+2. Аутентификация пользователя
+   `POST /login`
+   ```json
+   {
+       "username": "test",
+       "password": "test"
+   }
+
+- в роли администратора:
+   ```json
+   {
+       "username": "admin",
+       "password": "admin"
+   }
+
+3. Выход из аккаунта
+   `POST /logout`
+
+4. Получение актуальных показаний счетчиков
+   `GET /indications/actual/{id}`
+
+5. Получение истории подачи показаний счетчиков
+   `GET /indications/history/{id}`
+
+6. Получение показаний счетчиков за конкретный месяц
+   `GET /indications/month/{month_number}/{id}`
+
+7. Подача показаний
+   `POST /indications`
+   ```json
+   {
+       "heating": 100,
+       "hotWater": 200,
+       "coldWater": 300
+   }
+
+8. Получение аудита действий пользователей
+   `GET /admin/audits`
+
+9. Получение истории подачи показаний счетчиков пользователей
+   `GET /admin/indications`
 
 
-**telegram:** @MishaShaikh
+## Telegram
+- @MishaShaikh

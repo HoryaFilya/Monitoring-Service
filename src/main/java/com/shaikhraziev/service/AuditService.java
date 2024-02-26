@@ -32,7 +32,7 @@ public class AuditService {
      * @param username username пользователя
      */
     public void authorization(String username) throws SQLException {
-        auditRepository.authorization(username);
+        auditRepository.authentication(username);
     }
 
     /**
@@ -58,8 +58,8 @@ public class AuditService {
      *
      * @param username username пользователя
      */
-    public void uploadIndications(String username) throws SQLException {
-        auditRepository.uploadIndications(username);
+    public void uploadIndications(String username, Month month) throws SQLException {
+        auditRepository.uploadIndications(username, month);
     }
 
     /**
@@ -86,14 +86,14 @@ public class AuditService {
      * Выводит на консоль аудит действий пользователей
      */
     @SneakyThrows
-    public void getUserAudit() {
+    public List<String> getUserAudit() {
         List<Audit> audits = auditRepository.findAuditsAllUser();
 
-        if (audits.isEmpty()) {
-            System.out.println("Пользователи не совершали действий!");
-            return;
-        }
+        if (audits.isEmpty())
+            return List.of("Пользователи не совершали действий!");
 
-        audits.forEach(audit -> System.out.println("Дата: %s. Событие: %s".formatted(audit.getDate(), audit.getEvent())));
+        return audits.stream()
+                .map(audit -> "Дата: %s. Событие: %s".formatted(audit.getDate(), audit.getEvent()))
+                .toList();
     }
 }

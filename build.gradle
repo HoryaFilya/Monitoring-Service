@@ -1,0 +1,48 @@
+plugins {
+    id 'java'
+    id "org.gretty" version "4.1.2"
+    id "io.freefair.lombok" version "6.3.0"
+    id 'io.freefair.aspectj.post-compile-weaving' version '6.4.1'
+}
+
+gretty {
+    httpPort = 8080
+    contextPath = '/'
+}
+
+group = 'com.shaikhraziev'
+version = '1.0-TASK'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'org.postgresql:postgresql:42.7.1'
+    implementation 'org.liquibase:liquibase-core:4.26.0'
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.16.1'
+    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.16.1'
+    implementation 'io.jsonwebtoken:jjwt-api:0.12.5'
+    implementation 'org.aspectj:aspectjrt:1.9.8'
+    implementation 'org.aspectj:aspectjweaver:1.9.8'
+    implementation 'org.mapstruct:mapstruct:1.5.5.Final'
+
+    testImplementation 'org.assertj:assertj-core:3.25.3'
+    testImplementation 'org.junit.jupiter:junit-jupiter-engine:5.10.2'
+    testImplementation 'org.mockito:mockito-core:5.10.0'
+    testImplementation 'org.mockito:mockito-junit-jupiter:5.10.0'
+    testImplementation 'org.testcontainers:postgresql:1.19.5'
+
+    runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.5'
+    runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.5'
+
+    compileOnly 'jakarta.servlet:jakarta.servlet-api:6.0.0'
+}
+
+test {
+    useJUnitPlatform()
+}
+
+wrapper {
+    gradleVersion '7.3'
+}

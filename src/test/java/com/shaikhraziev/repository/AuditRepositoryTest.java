@@ -7,6 +7,7 @@ import org.junit.jupiter.api.*;
 
 import java.time.LocalDate;
 
+import static java.time.Month.FEBRUARY;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -24,7 +25,7 @@ class AuditRepositoryTest extends UnitTestBase {
     @SneakyThrows
     @Order(1)
     @DisplayName("should be record registration audit")
-    void shouldRecordRegistrationAudit() {
+    void registration() {
         auditRepository.registration(TEST_USERNAME);
 
         var actualResult = auditRepository.findAuditsAllUser().stream()
@@ -37,12 +38,12 @@ class AuditRepositoryTest extends UnitTestBase {
     @Test
     @SneakyThrows
     @Order(2)
-    @DisplayName("should be find audit on authorization")
-    void authorization() {
-        auditRepository.authorization(TEST_USERNAME);
+    @DisplayName("should be find audit on authentication")
+    void authentication() {
+        auditRepository.authentication(TEST_USERNAME);
 
         var actualResult = auditRepository.findAuditsAllUser().stream()
-                .filter(audit -> audit.getEvent().equals("Пользователь %s авторизовался.".formatted(TEST_USERNAME)))
+                .filter(audit -> audit.getEvent().equals("Пользователь %s аутентифицировался.".formatted(TEST_USERNAME)))
                 .findFirst();
 
         assertThat(actualResult).isPresent();
@@ -81,7 +82,7 @@ class AuditRepositoryTest extends UnitTestBase {
     @Order(5)
     @DisplayName("should be record upload indications audit")
     void uploadIndications() {
-        auditRepository.uploadIndications(TEST_USERNAME);
+        auditRepository.uploadIndications(TEST_USERNAME, FEBRUARY);
 
         var actualResult = auditRepository.findAuditsAllUser().stream()
                 .filter(audit -> audit.getEvent().equals("Пользователь %s подал показания.".formatted(TEST_USERNAME)))

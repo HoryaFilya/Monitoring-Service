@@ -2,12 +2,14 @@ package com.shaikhraziev.repository;
 
 import com.shaikhraziev.UnitTestBase;
 import com.shaikhraziev.dto.UserCreateEditDto;
-import com.shaikhraziev.entity.Role;
 import com.shaikhraziev.entity.User;
 import com.shaikhraziev.util.ConnectionManager;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.*;
 
+import java.util.Optional;
+
+import static com.shaikhraziev.entity.Role.USER;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class UserRepositoryTest extends UnitTestBase {
@@ -18,8 +20,8 @@ public class UserRepositoryTest extends UnitTestBase {
             container.getPassword()
     );
     private final UserRepository userRepository = new UserRepository(connectionManager);
+    private final User TEST_USER = new User(5L, "misha", "123q", USER);
     private final Long TEST_ADMIN_ID = 1L;
-    private final User TEST_USER = new User(null, "misha", "123q", Role.USER);
     private static final String CLEAR_TABLE_AUDIT = "DELETE FROM monitoring.audit WHERE id >= 1";
     private static final String CLEAR_TABLE_INDICATION = "DELETE FROM monitoring.indication WHERE id >= 1";
     private static final String CLEAR_TABLE_USERS = "DELETE FROM monitoring.users WHERE id >= 2";
@@ -39,26 +41,11 @@ public class UserRepositoryTest extends UnitTestBase {
 
     @Test
     @SneakyThrows
-    @DisplayName("should be saved user")
-    void save() {
-        var actualResult = userRepository.save(TEST_USER);
-
-        assertThat(actualResult).isTrue();
-    }
-
-    @Test
-    @SneakyThrows
     @DisplayName("should be get user which was saved")
-    void saveAndGet() {
-        var actualResult = userRepository.save(TEST_USER);
+    void save() {
+        User actualResult = userRepository.save(TEST_USER);
 
-        assertThat(actualResult).isTrue();
-
-        var actualResult2 = userRepository.findByUsername(TEST_USER.getUsername());
-
-        assertThat(actualResult2).isPresent();
-
-        assertThat(actualResult2.get().getUsername()).isEqualTo(TEST_USER.getUsername());
+        assertThat(actualResult.getUsername()).isEqualTo(TEST_USER.getUsername());
     }
 
     @Test
@@ -67,7 +54,7 @@ public class UserRepositoryTest extends UnitTestBase {
     void findByUsernameAndPassword() {
         userRepository.save(TEST_USER);
 
-        var actualResult = userRepository.findByUsernameAndPassword(UserCreateEditDto.builder()
+        Optional<User> actualResult = userRepository.findByUsernameAndPassword(UserCreateEditDto.builder()
                 .username(TEST_USER.getUsername())
                 .password(TEST_USER.getPassword())
                 .build());
@@ -83,7 +70,7 @@ public class UserRepositoryTest extends UnitTestBase {
     void findByUsername() {
         userRepository.save(TEST_USER);
 
-        var actualResult = userRepository.findByUsername(TEST_USER.getUsername());
+        Optional<User> actualResult = userRepository.findByUsername(TEST_USER.getUsername());
 
         assertThat(actualResult).isPresent();
 
@@ -94,7 +81,7 @@ public class UserRepositoryTest extends UnitTestBase {
     @SneakyThrows
     @DisplayName("should get admin by id = 1")
     void findById() {
-        var actualResult = userRepository.findById(TEST_ADMIN_ID);
+        Optional<User> actualResult = userRepository.findById(TEST_ADMIN_ID);
 
         assertThat(actualResult).isPresent();
 
